@@ -15,6 +15,7 @@ class Sample(object):
     def __init__(self, cuts=None,
                  ntuple_path=NTUPLE_PATH,
                  student=DEFAULT_STUDENT,
+                 suffix='',
                  tree_name=DEFAULT_TREE,
                  name='Sample',
                  label='Sample',
@@ -27,6 +28,7 @@ class Sample(object):
             self._cuts = cuts
         self.ntuple_path = ntuple_path
         self.student = student
+        self.suffix = suffix
         self.tree_name = tree_name
         self.name = name
         self.label = label
@@ -92,7 +94,7 @@ class Sample(object):
         return field_hist
 
     def total_events(self, weighted=False):
-        rfile = get_file(self.ntuple_path, self.student)
+        rfile = get_file(self.ntuple_path, self.student, suffix=self.suffix)
         if weighted:
             h = rfile['Nweights']
         else:
@@ -102,7 +104,7 @@ class Sample(object):
     def draw_helper(self, hist_template, expr, selection): 
         """
         """
-        rfile = get_file(self.ntuple_path, self.student)
+        rfile = get_file(self.ntuple_path, self.student, suffix=self.suffix)
         tree = rfile[self.tree_name]
         # use TTree Draw for now (limited to Nbins, Xmin, Xmax)
         binning = (

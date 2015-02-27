@@ -20,7 +20,7 @@ PILEUP_FILES = {}
 
 def get_file(ntuple_path=NTUPLE_PATH, student=DEFAULT_STUDENT, hdf=False, suffix='', force_reopen=False):
     ext = '.h5' if hdf else '.root'
-    filename = student + ext
+    filename = student + suffix + ext
     if filename in FILES and not force_reopen:
         return FILES[filename]
     file_path = os.path.join(ntuple_path, filename)

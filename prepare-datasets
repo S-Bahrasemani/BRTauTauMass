@@ -1,3 +1,9 @@
+"""
+This driver walks through the directory where
+the flat ntuple files have been produced and
+1 - create a database
+2 - read the database and merge the output.
+"""
 #!/usr/bin/env python
 import os
 import subprocess
@@ -8,13 +14,6 @@ from brtautau import UNMERGED_NTUPLE_PATH, NTUPLE_PATH
 from brtautau.datasets import create_database, read_database
 
 log = logging.getLogger(os.path.basename(__file__))
-
-from itertools import izip_longest
-def grouper(iterable, n, fillvalue=None):
-    "Collect data into fixed-length chunks or blocks"
-    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
-    args = [iter(iterable)] * n
-    return izip_longest(fillvalue=fillvalue, *args)
 
 
 if __name__ == '__main__':

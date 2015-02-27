@@ -1,33 +1,89 @@
+import yellowhiggs
+
 from .sample import Sample
-from .. import NTUPLE_PATH
+from .. import NTUPLE_PATH, DEFAULT_STUDENT
 from .. import log; log = log[__name__]
 
-
-MASSES = range(60, 205, 5)
-
-
-class Higgs(Sample):
+class Signal(Sample):
     pass
 
+class Higgs(Signal):
 
+    MASSES = range(60, 205, 5)
+    MODES = ['gg', 'VBF']
 
-class HiggsArray(Higgs):
-    """
-    """
-    def __init__(
-        self, cuts=None, 
-        ntuple_path=NTUPLE_PATH, **kwargs):
+    def __init__(self, e_com=13, 
+                 mode=None, modes=None,
+                 mass=None, masses=None,
+                 ntuple_path=NTUPLE_PATH,
+                 student=DEFAULT_STUDENT,
+                 suffix='_test',
+                 label=None,
+                 **kwargs):
+        """
+        Parameters
+        ----------
+        * e_com: LHC center-of-mass energy (13 or 8)
+        * mass: Mass of the Higgs boson
+        * mode: production mode (VBF/gg)
+        """
+        if masses is None:
+            if mass is not None:
+                assert mass in Higgs.MASSES
+                masses = [mass]
+            else:
+                # default to 125
+                masses = [125]
+        else:
+            assert len(masses) > 0
+            for mass in masses:
+                assert mass in Higgs.MASSES
+            assert len(set(masses)) == len(masses)
 
-        super(HiggsArray, self).__init__(cuts=cuts, ntuple_path=ntuple_path, **kwargs)
+        if modes is None:
+            if mode is not None:
+                assert mode in Higgs.MODES
+                modes = [mode]
+            else:
+                # default to all modes
+                modes = Higgs.MODES
+        else:
+            assert len(modes) > 0
+            for mode in modes:
+                assert mode in Higgs.MODES
+            assert len(set(modes)) == len(modes)
+            
+        name = 'Signal'
         
+        str_mode = ''
+        if len(modes) == 1:
+            str_mode = modes[0]
+            name += '_%s' % str_mode
+
+        str_mass = ''
+        if len(masses) == 1:
+            str_mass = '%d' % masses[0]
+            name += '_%s' % str_mass
+
+        if label is None:
+            label = '%s#font[52]{H}(%s)#rightarrow#tau#tau' % (
+                str_mode, str_mass)
+
+        super(Higgs, self).__init__(name=name, label=label, **kwargs)
         self._sub_samples = []
         self._scales = []
-        for mass in MASSES:
-            self._scales.append(1)
-            self._sub_samples.append(Higgs(
-                    ntuple_path=ntuple_path, student='flat_VBF_%s_test' % mass,
-                    name='Higgs%s' % mass, label='Higgs%s' % mass))
-            
+        for mode in modes:
+            for mass in masses:
+                self._sub_samples.append(Signal(
+                        ntuple_path=ntuple_path, 
+                        student='flat_%s_%s' % (mode, mass),
+                        suffix=suffix,
+                        name='Higgs_%s_%s' % (mode, mass), 
+                        label='Higgs_%s_%s' % (mode, mass)))
+                # Add all sample with a scale of 1
+                self._scales.append(1)
+
+
     @property
     def components(self):
         return self._sub_samples
@@ -73,3 +129,6 @@ class HiggsArray(Higgs):
             hsum += scale * h
 
         return hsum
+
+
+

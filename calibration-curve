@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+import os 
+import logging
+
+# rootpy/ROOT imports
+from rootpy.extern.argparse import ArgumentParser
+from rootpy.plotting.style import set_style
+from rootpy.plotting import Hist, Canvas, Graph
+import ROOT
+
+# local imports
+from brtautau.samples import Higgs
+
+# setup the logging
+log = logging.getLogger(os.path.basename(__file__))
+
+# setup the argument parser
+parser = ArgumentParser()
+parser.add_argument('--mode', type=str, default='VBF', choices=['VBF', 'gg'])
+args = parser.parse_args()
+
+
+set_style('ATLAS', shape='rect')
+
+
+# iterate over the masses and plot the lineshape
+brt_means = []
+for mass in Higgs.MASSES:
+    # instantiate a Higgs sample at a given mass
+    higgs = Higgs(mass=mass, mode=args.mode)
+    # Declare and fill the hist dict for the BRT mass
+    brt_hist = {'0.001*brt_mass': Hist(250, 0, 250)}
+    brt_hist = higgs.get_hist_array(brt_hist)
+
+    # Declare the BRT mass histogram
+    hist = brt_hist['0.001*brt_mass']
+    hist.xaxis.title = 'BRT Mass [GeV]'
+
+    # plot the lineshape
+    c = Canvas()
+    hist.Draw('HIST')
+    lat = ROOT.TLatex(
+        c.GetLeftMargin() + 0.05,
+        1 - c.GetTopMargin() - 0.05,
+        '({0})H#rightarrow#tau#tau @ {1} GeV'.format(args.mode, mass))
+    lat.SetNDC(True)
+    lat.SetTextSize(22)
+    lat.Draw()
+    c.SaveAs('./plots/lineshape_{0}_{1}.png'.format(args.mode, mass))
+
+    log.info('-- m(H) = %s: m(BRT) = %s, res = %s' % (mass, hist.GetMean(), hist.GetRMS() / mass))
+
+    brt_means.append(hist.GetMean())
+
+
+# Build the calibration curve
+gr_calib = Graph(len(brt_means))
+for i, (true, brt) in enumerate(zip(Higgs.MASSES, brt_means)):
+    gr_calib.SetPoint(i, true, brt)
+gr_calib.xaxis.title = 'True Higgs Mass [GeV]'
+gr_calib.yaxis.title = 'Mean of BRT Mass [GeV]'
+
+# Draw the calibration curve
+c = Canvas()
+gr_calib.Draw('AP')
+lat = ROOT.TLatex(
+    c.GetLeftMargin() + 0.05,
+    1 - c.GetTopMargin() - 0.05,
+    '{0}#rightarrowH#rightarrow#tau#tau'.format(args.mode))
+lat.SetNDC(True)
+lat.SetTextSize(22)
+lat.Draw()
+c.SaveAs('plots/calibration_{0}.png'.format(args.mode))

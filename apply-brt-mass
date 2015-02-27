@@ -1,3 +1,8 @@
+"""
+This driver runs over the flat ntuples (truth or reco)
+and append the brt mass estimator to the tree.
+"""
+
 #!/usr/bin/env python
 import os
 import shutil

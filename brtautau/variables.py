@@ -12,19 +12,45 @@ VARIABLES = {
         'type': 'f',
         'units': 'GeV',
         'scale': 0.001,
-        'bins': 100,
+        'bins': 30,
         'range': (50, 200)
         },
+
     'tau1_vis_pt': {
         'name': 'tau1_vis_pt',
         'root': 'Leading tau p_{T}',
         'type': 'f',
         'units': 'GeV',
         'scale': 0.001,
-        'bins': 100,
+        'bins': 20,
         'range': (20, 120)
         },
 
+    'tau2_vis_pt': {
+        'name': 'tau2_vis_pt',
+        'root': 'Subleading tau p_{T}',
+        'type': 'f',
+        'units': 'GeV',
+        'scale': 0.001,
+        'bins': 20,
+        'range': (20, 120)
+        },
+
+    'tau1_vis_eta': {
+        'name': 'tau1_vis_eta',
+        'root': 'Leading tau #eta',
+        'type': 'f',
+        'bins': 20,
+        'range': (-2.5, 2.5)
+        },
+
+    'tau2_vis_eta': {
+        'name': 'tau2_vis_eta',
+        'root': 'Subleading tau #eta',
+        'type': 'f',
+        'bins': 20,
+        'range': (-2.5, 2.5)
+        },
 
     # 'dPhi_tau1_met': {},
 
@@ -34,7 +60,13 @@ VARIABLES = {
 
     # 'dPhi_taus_met': {},
 
-    # 'dR_taus': {},
+    'dR_taus': {
+        'name': 'dR_taus',
+        'root': '#Delta R(#tau, #tau)',
+        'type': 'f',
+        'bins': 20,
+        'range': (0, 4)
+        },
 
     # 'eta_product_jets': {},
     
