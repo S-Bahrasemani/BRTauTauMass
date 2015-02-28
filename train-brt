@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+import os
+import logging
+log = logging.getLogger(os.path.basename(__file__))
+
+from brtautau.regressor import Regressor
+from brtautau.categories.features import features_stupid
+
+
+features = features_stupid
+brt_regressor = Regressor(
+    'training_output.root',
+    features)
+
+brt_regressor.train()
+
+

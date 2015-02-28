@@ -1,9 +1,5 @@
-"""
-This driver runs over the flat ntuples (truth or reco)
-and append the brt mass estimator to the tree.
-"""
-
 #!/usr/bin/env python
+
 import os
 import shutil
 
@@ -23,16 +19,21 @@ log = logging.getLogger('apply-bdt-weights')
 
 brt_reader = ROOT.TMVA.Reader()
 brt_input_variables = {}
+
 for feat in features_VBF:
        brt_input_variables[feat] = array.array('f', [-1.])
        brt_reader.AddVariable(feat, brt_input_variables[feat])
-
+       
 brt_reader.BookMVA("BRT_HiggsMass", "weights/test.xml")
 
 def evaluate_brt(tree, reader, feats):
-    for f in feats.keys():
-        feats[f] = getattr(tree, f)
-    return reader.EvaluateMVA('BRT_HiggsMass')
+       # log.debug('------------------')
+       for f in feats.keys():
+              feats[f][0] = getattr(tree, f)
+       # log.debug(feats)
+       mass = reader.EvaluateMVA('BRT_HiggsMass')
+       # log.debug('BRT MASS = %s' % mass)
+       return mass
 
 
 class Model(TreeModel):

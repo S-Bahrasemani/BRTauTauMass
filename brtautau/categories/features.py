@@ -28,3 +28,11 @@ features_VBF = [
     'vector_sum_pt_tau1_tau2',
     'vector_sum_pt_tau1_tau2_met',
 ]
+
+
+features_stupid = [
+    'tau1_vis_pt',
+    'tau1_vis_pt',
+    'tau2_vis_eta',
+    'tau2_vis_eta',
+    ]
