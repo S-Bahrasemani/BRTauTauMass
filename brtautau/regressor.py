@@ -22,6 +22,7 @@ class Regressor(TMVA.Factory):
                  verbose='V:!Silent:Color:DrawProgressBar'):
 
         self.output = root_open(output_name, 'recreate')
+
         TMVA.Factory.__init__(
             self, factory_name, self.output, verbose)
         self.factory_name = factory_name
@@ -41,7 +42,7 @@ class Regressor(TMVA.Factory):
                 var['type'])
 
     def book_brt(self,
-                 ntrees=100,
+                 ntrees=80,
                  node_size=5,
                  depth=8):
         """
@@ -96,6 +97,11 @@ class Regressor(TMVA.Factory):
             tree = rfile[s.tree_name]
             self.AddRegressionTree(tree)
         self.AddRegressionTarget('higgs_m')
+        # multiple targets does not seem to work with TMVA :-(
+        # self.AddRegressionTarget('higgs_pt')
+        # self.AddRegressionTarget('higgs_eta')
+        # self.AddRegressionTarget('higgs_phi')
+
         # Could reweight samples 
         # self.AddWeightExpression("my_expression")
 
