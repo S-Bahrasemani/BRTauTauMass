@@ -21,6 +21,15 @@ def get_xtitle(field):
     else:
         return field
 
+def get_ymax(hists):
+    """ Return the y max of several hist """
+    if not isinstance(hists, (list, tuple)):
+        return 0.
+    
+    sorted_hists = sorted(
+        hists, key=lambda h: h.GetBinContent(h.GetMaximumBin()),
+        reverse=True)
+    return sorted_hists[0].GetBinContent(sorted_hists[0].GetMaximumBin())
 
 
 def draw_ratio(a, b, field, category,
@@ -335,6 +344,8 @@ def draw_hists(
     hists[0].xaxis.title = xtitle
     hists[0].yaxis.title = 'Arbitrary Unit'
 
+    y_max = get_ymax(hists)
+    hists[0].yaxis.SetRangeUser(0., 1.05 * y_max) 
     hists[0].Draw('HIST')
 
     colors = ['black', 'red', 'orange', 'blue', 'green', 'purple', 'yellow', 'pink',]
