@@ -11,8 +11,6 @@ from samples import Higgs
 from samples.db import get_file
 
 
-
-
 class Regressor(TMVA.Factory):
     """
     """
