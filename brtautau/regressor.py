@@ -11,6 +11,7 @@ from samples import Higgs
 from samples.db import get_file
 
 
+
 class Regressor(TMVA.Factory):
     """
     """
@@ -96,8 +97,8 @@ class Regressor(TMVA.Factory):
             tree = rfile[s.tree_name]
             self.AddRegressionTree(tree)
         self.AddRegressionTarget('resonance_m')
-        ### adding Spectator varaibles
-        #self.AddSpectator("resonance_m")
+        # Could reweight samples 
+        # self.AddWeightExpression("my_expression")
 
         # Actual training
         self.book_brt(**kwargs)
