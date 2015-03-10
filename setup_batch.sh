@@ -9,9 +9,10 @@ function setup_CVMFS() {
 
 function setup_ROOT_cvmfs()
 {
-    # 5.34.25-x86_64-slc6-gcc48-opt #
-    export rootVersion=6.02.05-x86_64-slc6-gcc48-opt
-    source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion ${rootVersion}
+    #  #
+    export rootVersion=5.34.25-x86_64-slc6-gcc48-opt
+# 6.02.05-x86_64-slc6-gcc48-opt
+    source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion ${rootVersion} --skipConfirm
 }
 
 function setup_ROOT_sfu()
@@ -44,3 +45,5 @@ echo 'Then, ROOT'
 setup_ROOT_cvmfs
 echo 'And, python'
 setup_PYTHON
+# echo 'and my local TMVA'
+# source setup_tmva.sh /cluster/data09/qbuat/tmva_sandbox/TMVA
