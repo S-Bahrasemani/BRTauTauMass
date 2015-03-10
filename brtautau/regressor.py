@@ -49,7 +49,7 @@ class Regressor(TMVA.Factory):
         Book the BRT method (set all the parameters)
         """
         params = ["SeparationType=RegressionVariance"]
-        params += ["BoostType=AdaBoostR2"]
+        params += ["BoostType=AdaBoost"]
         params += ["AdaBoostBeta=0.2"]
         params += ["MaxDepth={0}".format(depth)]
         params += ["MinNodeSize={0}%".format(node_size)]
@@ -73,14 +73,14 @@ class Regressor(TMVA.Factory):
             method_name,
             params_string)
 
-    def train(self, **kwargs):
+    def train(self, mode='gg', **kwargs):
         """
         Run, Run !
         """
         self.set_variables()
         
 
-        higgs_array = Higgs(mode='VBF', masses=Higgs.MASSES, suffix='_train')
+        higgs_array = Higgs(mode=mode, masses=Higgs.MASSES, suffix='_train')
 
         cut = Cut('hadhad==1')
         
@@ -96,12 +96,9 @@ class Regressor(TMVA.Factory):
             rfile = get_file(s.ntuple_path, s.student, suffix=s.suffix)
             tree = rfile[s.tree_name]
             self.AddRegressionTree(tree)
-        self.AddRegressionTarget('higgs_m')
-        # multiple targets does not seem to work with TMVA :-(
-        # self.AddRegressionTarget('higgs_pt')
-        # self.AddRegressionTarget('higgs_eta')
-        # self.AddRegressionTarget('higgs_phi')
-
+        self.AddRegressionTarget('resonance_m')
+        ### adding Spectator varaibles
+        #self.AddSpectator("resonance_m")
         # Could reweight samples 
         # self.AddWeightExpression("my_expression")
 

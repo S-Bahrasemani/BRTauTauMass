@@ -14,7 +14,6 @@ log = logging.getLogger(os.path.basename(__file__))
 
 set_style('ATLAS', shape='rect')
 
-
 if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()

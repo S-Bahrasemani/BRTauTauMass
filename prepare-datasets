@@ -1,10 +1,5 @@
-"""
-This driver walks through the directory where
-the flat ntuple files have been produced and
-1 - create a database
-2 - read the database and merge the output.
-"""
 #!/usr/bin/env python
+
 import os
 import subprocess
 import glob
@@ -15,6 +10,13 @@ from brtautau.datasets import create_database, read_database
 
 log = logging.getLogger(os.path.basename(__file__))
 
+
+"""
+This driver walks through the directory where
+the flat ntuple files have been produced and
+1 - create a database
+2 - read the database and merge the output.
+"""
 
 if __name__ == '__main__':
     from rootpy.extern.argparse import ArgumentParser
