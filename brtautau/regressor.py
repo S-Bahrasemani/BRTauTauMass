@@ -97,8 +97,8 @@ class Regressor(TMVA.Factory):
             tree = rfile[s.tree_name]
             self.AddRegressionTree(tree)
         self.AddRegressionTarget('resonance_m')
-        # Could reweight samples 
-        # self.AddWeightExpression("my_expression")
+        ### adding Spectator varaibles
+        #self.AddSpectator("resonance_m")
 
         # Actual training
         self.book_brt(**kwargs)

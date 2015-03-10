@@ -2,7 +2,7 @@ from math import pi
 from rootpy.tree import Cut
 from .common import (
     Category_Preselection,
-    Category_Preselection_DEta_Control,
+    Category_Preselection_DxEta_Control,
     CUTS_VBF, CUTS_VBF_CR,
     CUTS_BOOSTED, CUTS_BOOSTED_CR,
     DETA_TAUS)
@@ -25,7 +25,7 @@ class Category_VBF_DEta_Control(Category_Preselection):
     common_cuts = Category_Preselection.common_cuts
     #norm_category = Category_Preselection_DEta_Control
     norm_category = Category_Preselection
-    cuts = CUTS_VBF_CR & Cut('dEta_jets > 2.0')
+    cuts = CUTS_VBF_CR & Cut('dEta_jet1_jet2 > 2.0')
 
 
 class Category_VBF(Category_Preselection):
@@ -38,7 +38,7 @@ class Category_VBF(Category_Preselection):
     common_cuts = Category_Preselection.common_cuts
     cuts = (
         CUTS_VBF
-        & Cut('dEta_jets > 2.0')
+        & Cut('dEta_jet1_jet2 > 2.0')
         )
     cuts_truth = CUTS_TRUE_VBF
     features = features_vbf
