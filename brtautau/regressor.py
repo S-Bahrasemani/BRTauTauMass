@@ -43,7 +43,7 @@ class Regressor(TMVA.Factory):
 
     def book_brt(self,
                  ntrees=80,
-                 node_size=5,
+                 node_size=0.2,
                  depth=8):
         """
         Book the BRT method (set all the parameters)
@@ -84,9 +84,9 @@ class Regressor(TMVA.Factory):
 
         cut = Cut('hadhad==1')
         
-        params = ['nTrain_Regression=0']
-        params += ['nTest_Regression=1']
-        params += ['SplitMode=Random']
+        # params = ['nTrain_Regression=0']
+        # params += ['nTest_Regression=1']
+        params = ['SplitMode=Random']
         params += ['NormMode=NumEvents']
         params += ['!V']
         params = ':'.join(params)

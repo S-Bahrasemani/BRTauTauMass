@@ -29,7 +29,7 @@ for mass in Higgs.MASSES:
     # instantiate a Higgs sample at a given mass
     higgs = Higgs(mass=mass, mode=args.mode)
     # Declare and fill the hist dict for the BRT mass
-    brt_hist = {'0.001*brt_mass': Hist(250, 0, 250)}
+    brt_hist = {'0.001*brt_mass': Hist(50, 0, 250)}
     brt_hist = higgs.get_hist_array(brt_hist)
 
     # Declare the BRT mass histogram

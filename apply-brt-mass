@@ -32,7 +32,7 @@ def evaluate_brt(tree, reader, feats):
               feats[f][0] = getattr(tree, f)
        # log.debug(feats)
        mass = reader.EvaluateMVA('BRT_HiggsMass')
-       log.debug('BRT MASS = %s' % mass)
+       # log.debug('BRT MASS = %s' % mass)
        return mass
 
 

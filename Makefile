@@ -13,3 +13,5 @@ clean-training:
 	find weights -name "*.xml" -exec rm {} \;
 	find weights -name "*.C" -exec rm {} \;
 
+montage:
+	@montage -tile 4x5 -geometry 400x400+3+3 plots/*.png montage.pdf

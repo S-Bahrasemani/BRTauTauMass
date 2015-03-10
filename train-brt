@@ -6,12 +6,11 @@ from ROOT import TMVA
 from brtautau.regressor import Regressor
 from brtautau.categories.features import FEATURES 
 
-if __name__ == "__main__":
-    from argparse import ArgumentParser
-    parser = ArgumentParser()
-    parser.add_argument('--mode', default='gg', type=str, choices=['VBF', 'gg'])
-    parser.add_argument('--dry', action='store_true', default=False)
-    args = parser.parse_args()
+from rootpy.extern.argparse import ArgumentParser
+parser = ArgumentParser()
+parser.add_argument('--mode', default='gg', type=str, choices=['VBF', 'gg'])
+parser.add_argument('--dry', action='store_true', default=False)
+args = parser.parse_args()
 
 ## Set the directory where to save the weights file.
 (TMVA.gConfig().GetIONames()).fWeightFileDir = './RESULTS/'
