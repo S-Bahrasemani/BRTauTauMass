@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 import os 
 import logging
-
+import math
 # rootpy/ROOT imports
 from rootpy.extern.argparse import ArgumentParser
 from rootpy.plotting.style import set_style
 from rootpy.plotting import Hist, Canvas, Graph
+
+#from rootpy.plotting.core.style import Color, LineStyle, FillStyle, MarkerStyle
 import ROOT
+
+
+
 
 # local imports
 from brtautau.samples import Higgs
@@ -17,19 +22,18 @@ log = logging.getLogger(os.path.basename(__file__))
 # setup the argument parser
 parser = ArgumentParser()
 parser.add_argument('--mode', type=str, default='VBF', choices=['VBF', 'gg'])
+parser.add_argument('--level', type = str , default = 'truth', choices = ['truth', 'reco'])
 args = parser.parse_args()
 
 
 set_style('ATLAS', shape='rect')
-
-
 # iterate over the masses and plot the lineshape
 brt_means = []
 for mass in Higgs.MASSES:
     # instantiate a Higgs sample at a given mass
     higgs = Higgs(mass=mass, mode=args.mode)
     # Declare and fill the hist dict for the BRT mass
-    brt_hist = {'0.001*brt_mass': Hist(50, 0, 250)}
+    brt_hist = {'0.001*brt_mass': Hist(30, 0, 250)}
     brt_hist = higgs.get_hist_array(brt_hist)
 
     # Declare the BRT mass histogram
@@ -48,7 +52,7 @@ for mass in Higgs.MASSES:
     lat.Draw()
     c.SaveAs('./plots/lineshape_{0}_{1}.png'.format(args.mode, mass))
 
-    log.info('-- m(H) = %s: m(BRT) = %s, res = %s' % (mass, hist.GetMean(), hist.GetRMS() / mass))
+    log.info('-- m(H) = %s: m(BRT) = %s, res = %s' % (mass, hist.GetMean(), hist.GetRMS()))
 
     brt_means.append(hist.GetMean())
 
@@ -71,3 +75,75 @@ lat.SetNDC(True)
 lat.SetTextSize(22)
 lat.Draw()
 c.SaveAs('plots/calibration_{0}.png'.format(args.mode))
+
+
+## Resolution plots 
+res_hists = {}
+res_hists['rms_mass_BRT_vs_mass_true'] = ROOT.TGraphErrors()
+res_hists['rms_mass_BRT_vs_mass_true'].SetName('rms_mass_BRT_vs_mass_true')
+res_hists['rms_mass_BRT_vs_mass_true'].SetMarkerSize(0.3)
+res_hists['rms_mass_BRT_vs_mass_true'].SetMarkerStyle(20)
+res_hists['rms_mass_BRT_vs_mass_true'].SetMarkerColor(2)
+res_hists['rms_mass_BRT_vs_mass_true'].SetLineColor(2)
+res_hists['res_mass_BRT_vs_mass_true'] = ROOT.TGraphErrors()
+res_hists['res_mass_BRT_vs_mass_true'].SetName('res_mass_BRT_vs_mass_true')
+res_hists['res_mass_BRT_vs_mass_true'].SetMarkerSize(0.3)
+res_hists['res_mass_BRT_vs_mass_true'].SetMarkerStyle(20)
+res_hists['res_mass_BRT_vs_mass_true'].SetMarkerColor(4)
+res_hists['res_mass_BRT_vs_mass_true'].SetLineColor(4)
+
+res_hists['rms_mass_BRT_vs_mass_true'].SetMinimum(0)
+res_hists['rms_mass_BRT_vs_mass_true'].SetMaximum(50)
+res_hists['res_mass_BRT_vs_mass_true'].SetMinimum(0)
+res_hists['res_mass_BRT_vs_mass_true'].SetMaximum(0.7)
+
+
+
+p = 0
+for mass in Higgs.MASSES:
+    higgs = Higgs (mass = mass, mode = args.mode)
+    brt_hist = {'0.001*brt_mass': Hist(30, 0, 250)}
+    brt_hist = higgs.get_hist_array(brt_hist)
+
+    mean = brt_hist['0.001*brt_mass'].GetMean()
+    mean_error = brt_hist['0.001*brt_mass'].GetMeanError()
+    rms = brt_hist['0.001*brt_mass'].GetRMS()
+    rms_error = brt_hist['0.001*brt_mass'].GetRMSError()
+
+    res_hists['rms_mass_BRT_vs_mass_true'].SetPoint(p,mass,rms)
+    res_hists['rms_mass_BRT_vs_mass_true'].SetPointError(p,0,rms_error)
+    res_hists['res_mass_BRT_vs_mass_true'].SetPoint(p,mass,rms/mean)
+    res_hists['res_mass_BRT_vs_mass_true'].SetPointError(p,0,math.sqrt(pow(rms_error/mean,2)+pow(rms/(mean*mean)*mean_error,2)))
+    p +=1
+
+# Draw the resolution plots
+c = Canvas()
+
+res_hists['rms_mass_BRT_vs_mass_true'].Draw('AP')
+res_hists['rms_mass_BRT_vs_mass_true'].GetXaxis().SetTitle('m_{true} [GeV]')
+res_hists['rms_mass_BRT_vs_mass_true'].GetYaxis().SetTitle('RMS-m_{brt}  [GeV]')
+
+lat = ROOT.TLatex(
+    c.GetLeftMargin() + 0.05,
+    1 - c.GetTopMargin() - 0.05,
+    '{0}#rightarrowH#rightarrow#tau#tau'.format(args.mode))
+
+lat.SetNDC(True)
+lat.SetTextSize(22)
+lat.Draw()
+c.SaveAs('plots/rms_mass_BRT_vs_mass_true_{0}.png'.format(args.mode))
+
+res_hists['res_mass_BRT_vs_mass_true'].Draw('AP')
+res_hists['res_mass_BRT_vs_mass_true'].GetXaxis().SetTitle('m_{true} [GeV]')
+res_hists['res_mass_BRT_vs_mass_true'].GetYaxis().SetTitle('res-m_{brt} ')
+
+lat = ROOT.TLatex(
+    c.GetLeftMargin() + 0.05,
+    1 - c.GetTopMargin() - 0.05,
+    '{0}#rightarrowH#rightarrow#tau#tau'.format(args.mode))
+
+lat.SetNDC(True)
+lat.SetTextSize(22)
+lat.Draw()
+c.SaveAs('plots/res_mass_BRT_vs_mass_true_{0}.png'.format(args.mode))
+

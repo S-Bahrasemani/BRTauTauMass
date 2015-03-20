@@ -11,14 +11,15 @@ class Higgs(Signal):
 
     MASSES = range(60, 205, 5)
     MODES = ['gg', 'VBF']
-
+    LEVELS = ['truth', 'reco']
     def __init__(self, e_com=13, 
                  mode=None, modes=None,
                  mass=None, masses=None,
                  ntuple_path=NTUPLE_PATH,
                  student=DEFAULT_STUDENT,
                  suffix='_test',
-                 label=None,
+                 prefix =None,
+                label=None,
                  **kwargs):
         """
         Parameters
@@ -76,7 +77,7 @@ class Higgs(Signal):
             for mass in masses:
                 self._sub_samples.append(Signal(
                         ntuple_path=ntuple_path, 
-                        student='flat_%s_%s' % (mode, mass),
+                        student='weighted.flat_%s_%s' % (mode, mass),
                         suffix=suffix,
                         name='Higgs_%s_%s' % (mode, mass), 
                         label='Higgs_%s_%s' % (mode, mass)))

@@ -21,10 +21,11 @@ brt_reader = ROOT.TMVA.Reader()
 brt_input_variables = {}
 
 for feat in FEATURES:
+     
        brt_input_variables[feat] = array.array('f', [-1.])
        brt_reader.AddVariable(feat, brt_input_variables[feat])
        
-brt_reader.BookMVA("BRT_HiggsMass", "./RESULTS/TMVARegression_BRT_HiggsMass.weights.xml")
+brt_reader.BookMVA("BRT_HiggsMass", "./RESULTS/TMVARegression_BRT_HiggsMass_gg_03172015.weights.xml")
 
 def evaluate_brt(tree, reader, feats):
        # log.debug('------------------')
@@ -66,10 +67,10 @@ class Job(Process):
         log.info("copying {0} to {1} ...".format(filename, output))
         shutil.copy(filename, output)
         with root_open(output, 'UPDATE') as file:
-            tree = file.Tree
+            tree = file.tau
             if 'brt_mass' in tree:
-                log.info("brt mass already exists in {0} ...".format(output))
-                return
+                   log.info("brt mass already exists in {0} ...".format(output))
+                   return
             log.info("adding brt mass to {0} ...".format(output))
             add_brt_mass(tree)
             tree.Write(tree.name, ROOT.TObject.kOverwrite)

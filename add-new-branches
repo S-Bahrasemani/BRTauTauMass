@@ -1,0 +1,123 @@
+#!/usr/bin/env python
+
+import os
+import shutil
+
+import ROOT
+import math 
+from rootpy.io import root_open
+from rootpy.tree import TreeModel, FloatCol
+from rootpy.stl import vector
+from brtautau import parallel 
+import logging
+from multiprocessing import Process
+import array
+from brtautau.parallel import run_pool
+from brtautau.categories.features import FEATURES 
+log = logging.getLogger('apply-bdt-weights')
+
+
+newvariables = ['transverse_mass_tau1_tau2', 'transverse_mass_tau1_met', 'transverse_mass_tau2_met', 'pt_diff_tau1_tau2']
+var = newvariables[0]
+class Model(TreeModel):
+   #dPhi_tau1_tau2_MET = FloatCol()
+   #sum_pt_ratio_jets_taus = FloatCol()
+   #vector_sum_pt_ratio_jets_taus = FloatCol()
+   #vector_sum_pt_ratio_jets_taus = FloatCol()
+   #vector_sum_pt_ratio_full_tausMET = FloatCol()
+   #transverse_mass_tau1_tau2= FloatCol()
+  #transverse_mass_tau1_tau2= FloatCol()
+   transverse_mass_tau1_tau2 = FloatCol()
+   transverse_mass_tau1_met= FloatCol()
+   transverse_mass_tau2_met = FloatCol()
+   pt_diff_tau1_tau2 = FloatCol()
+   sum_pt_tau1_tau2 = FloatCol()
+   sum_pt_tau1_tau2_met = FloatCol()
+   
+def deltaPhi(phi1,phi2):
+    dPhi=abs(phi1-phi2)
+    while dPhi>math.pi:
+        dPhi=dPhi-2*math.pi
+    return abs(dPhi)
+
+def add_new_branches(tree):
+   tree.create_buffer()
+   tree.set_buffer(Model(), create_branches=True)
+   branch1 = tree.GetBranch('transverse_mass_tau1_tau2')
+   branch2 = tree.GetBranch('transverse_mass_tau1_met')
+   branch3 = tree.GetBranch('transverse_mass_tau2_met')
+   branch4 = tree.GetBranch('pt_diff_tau1_tau2')
+   branch5 = tree.GetBranch('sum_pt_tau1_tau2')
+   branch6 = tree.GetBranch('sum_pt_tau1_tau2_met')
+   
+   for event in tree:
+      tau1 = ROOT.TLorentzVector()
+      tau1.SetPtEtaPhiE(event.tau1_pt, event.tau1_eta, event.tau1_phi, event.tau1_e)        
+      tau2 = ROOT.TLorentzVector()
+      tau2.SetPtEtaPhiE(event.tau2_pt, event.tau2_eta, event.tau2_phi, event.tau2_e)
+      
+      MET = ROOT.TVector2()
+      MET.SetMagPhi(event.MET_et, event.MET_phi)
+      
+     # jet1 = ROOT.TLorentzVector()
+     # jet1.SetPtEtaPhiE(event.jet1_pt, event.jet1_eta, event.jet1_phi, event.jet1_e)
+     # jet2 = ROOT.TLorentzVector()
+     # jet2.SetPtEtaPhiE(event.jet2_pt, event.jet2_eta, event.jet2_phi, event.jet2_e)
+      
+      tree.transverse_mass_tau1_tau2 = math.sqrt(2*event.tau1_pt*event.tau2_pt*(1.-math.cos(tau1.DeltaPhi(tau2))))
+      branch1.Fill()
+
+      tree.transverse_mass_tau1_met = math.sqrt((MET.Mod() + event.tau1_pt)**2 - 
+                                                (MET.Px()*tau1.Px() + MET.Py()*tau1.Px() + MET.Px()*tau1.Py() + MET.Py()*tau1.Py()))
+      branch2.Fill()
+
+      tree.transverse_mass_tau2_met = math.sqrt((MET.Mod() + event.tau2_pt)**2 - 
+                                                (MET.Px()*tau2.Px() + MET.Py()*tau2.Px() + MET.Px()*tau2.Py() + MET.Py()*tau2.Py()))
+      branch3.Fill()
+
+         
+      tree.pt_diff_tau1_tau2 = math.sqrt((tau1.Px() - tau2.Px())**2+(tau1.Py() - tau2.Py())**2)/(event.tau1_pt+event.tau2_pt)
+      branch4.Fill()
+      tree.sum_pt_tau1_tau2 = event.tau1_pt + event.tau2_pt
+      branch5.Fill()
+      tree.sum_pt_tau1_tau2_met = event.tau1_pt + event.tau2_pt + MET.Mod()
+      branch6.Fill()
+
+      
+   tree.SetEntries(-1)
+            
+
+class Job(Process):
+    def __init__(self, filename):
+        super(Job, self).__init__()
+        self.filename = filename
+
+    def run(self):
+        filename = self.filename
+        path, name = os.path.split(filename)
+        # copy to new file
+        output = os.path.join(path, 'v1.' + name)
+        if os.path.exists(output):
+            return
+        log.info("copying {0} to {1} ...".format(filename, output))
+        shutil.copy(filename, output)
+        with root_open(output, 'UPDATE') as file:
+            tree = file.tau
+            #if 'dPhi_tau1_tau2_MET' in tree:
+             #      log.info("dphi_taus_met already exists in {0} ...".format(output))
+              #     return
+            #log.info("adding dphi_taus_met to {0} ...".format(output))
+            add_new_branches(tree)
+            tree.Write(tree.name, ROOT.TObject.kOverwrite)
+
+
+if __name__ == '__main__':
+    from rootpy.extern.argparse import ArgumentParser
+
+    parser = ArgumentParser()
+    parser.add_argument('files', nargs='+')
+    args = parser.parse_args()
+
+  
+    jobs = [Job(f) for f in args.files]
+    run_pool(jobs, n_jobs=-1)

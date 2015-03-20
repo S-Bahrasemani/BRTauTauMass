@@ -4,14 +4,21 @@ import os
 from ROOT import TMVA
 from rootpy.io import root_open
 from rootpy.tree import Cut
+import datetime
 # local imports
 from . import log; log[__name__]
 from .variables import VARIABLES
 from samples import Higgs
 from samples.db import get_file
 
+from rootpy.extern.argparse import ArgumentParser
+parser = ArgumentParser()
+parser.add_argument('--mode', default='gg', type=str, choices=['VBF', 'gg'])
+parser.add_argument('--dry', action='store_true', default=False)
+args = parser.parse_args()
 
-
+my_datetime = datetime.date.today()
+my_datetime = my_datetime.strftime("%m%d%Y")
 class Regressor(TMVA.Factory):
     """
     """
@@ -64,7 +71,7 @@ class Regressor(TMVA.Factory):
         # params += ["nEventsMin={0}".format(nEventsMin)]
         log.info(params)
 
-        method_name = "BRT_HiggsMass"
+        method_name =   "BRT_HiggsMass_"+str(args.mode) +'_' + str(my_datetime) 
         params_string = "!H:V"
         for param in params:
             params_string+= ":"+param
@@ -84,9 +91,9 @@ class Regressor(TMVA.Factory):
 
         cut = Cut('hadhad==1')
         
-        # params = ['nTrain_Regression=0']
-        # params += ['nTest_Regression=1']
-        params = ['SplitMode=Random']
+        params = ['nTrain_Regression=0']
+        params += ['nTest_Regression=1']
+        #params = ['SplitMode=Random']
         params += ['NormMode=NumEvents']
         params += ['!V']
         params = ':'.join(params)

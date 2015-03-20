@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import os
+import datetime
 import logging
+
 log = logging.getLogger(os.path.basename(__file__))
 from ROOT import TMVA
 from brtautau.regressor import Regressor
@@ -16,10 +18,11 @@ args = parser.parse_args()
 (TMVA.gConfig().GetIONames()).fWeightFileDir = './RESULTS/'
 
 log.info("Training begins !")
-
+my_datetime = datetime.date.today()
+my_datetime = my_datetime.strftime("%m%d%Y")
 features = FEATURES
 brt_regressor = Regressor(
-    './RESULTS/'+ str(args.mode)+'_training_output.root',
+    './RESULTS/'+ str(args.mode) +'_' +  str(my_datetime) + '_training_output.root',
     features)
 
 brt_regressor.train(mode=args.mode)
