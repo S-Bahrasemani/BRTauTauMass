@@ -84,6 +84,18 @@ VARIABLES = {
         'range': (-2.5, 2.5)
         },
  
+    'dEta_jets': {
+        'name': 'dEta_jets',
+        'root': 'd#eta_{jj}',
+        'type': 'f',
+        'bins': 20,
+        'range': (-10, 10)
+        },
+ 
+
+    
+    
+
     'dPhi_tau1_MET': {
         'name': 'dPhi_tau1_MET', 
         'root': '#Delta #phi(#tau1, MET)',
@@ -218,21 +230,21 @@ VARIABLES = {
         },
 
 
-    'tau1_eta_centrality': {
-       'name': 'tau1_eta_centrality' ,
-        'root': '#tau 1 #eta -Centrality',
-        'type': 'f',
-        'bins':20,  
-        'range': (0. , 1.5)
-        },
+    # 'tau1_eta_centrality': {
+    #    'name': 'tau1_eta_centrality' ,
+    #     'root': '#tau 1 #eta -Centrality',
+    #     'type': 'f',
+    #     'bins':20,  
+    #     'range': (0. , 1.5)
+    #     },
 
-    'tau2_eta_centrality': {
-        'name': 'tau2_eta_centrality' ,
-        'root': '#tau 2 #eta -Centrality',
-        'type': 'f',
-        'bins':20,  
-        'range': (0. , 1.5)
-        },
+    # 'tau2_eta_centrality': {
+    #     'name': 'tau2_eta_centrality' ,
+    #     'root': '#tau 2 #eta -Centrality',
+    #     'type': 'f',
+    #     'bins':20,  
+    #     'range': (0. , 1.5)
+    #     },
 
 
     'transverse_mass_tau1_met': {
@@ -288,76 +300,76 @@ VARIABLES = {
         'range': (0. , 700.)
         },
 
-    'sum_pt_full': {
-        'name': 'sum_pt_full', 
-        'root': '#P^{Full}_{T}',
-        'type': 'f',
-        'units' : 'GeV',
-        'scale': 0.001,
-        'bins': 30,
-        'range': (0. , 1200.)
-        },
+    # 'sum_pt_full': {
+    #     'name': 'sum_pt_full', 
+    #     'root': '#P^{Full}_{T}',
+    #     'type': 'f',
+    #     'units' : 'GeV',
+    #     'scale': 0.001,
+    #     'bins': 30,
+    #     'range': (0. , 1200.)
+    #     },
 
 
-    'vector_sum_pt_full': {
-        'name': 'vector_sum_pt_full', 
-        'root': '#vec{P}^{Full}_{T}',
-        'type': 'f',
-        'units' : 'GeV',
-        'scale': 0.001,
-        'bins': 30,
-        'range': (0. , 1200.)
-        },
+    # 'vector_sum_pt_full': {
+    #     'name': 'vector_sum_pt_full', 
+    #     'root': '#vec{P}^{Full}_{T}',
+    #     'type': 'f',
+    #     'units' : 'GeV',
+    #     'scale': 0.001,
+    #     'bins': 30,
+    #     'range': (0. , 1200.)
+    #     },
 
 
 
 ##### RELATIVE kinematics of jets and taus
 
-    'mass_ratio_jets_taus': {
-        'name': 'mass_ratio_jets_taus', 
-        'root': 'm_{jj}/m_{#tau#tau}',
-        'type': 'f',
-        'units' : '',
-        'bins': 40,
-        'range': (0. , 30.)
-        },
+    # 'mass_ratio_jets_taus': {
+    #     'name': 'mass_ratio_jets_taus', 
+    #     'root': 'm_{jj}/m_{#tau#tau}',
+    #     'type': 'f',
+    #     'units' : '',
+    #     'bins': 40,
+    #     'range': (0. , 30.)
+    #     },
 
-    'sum_pt_ratio_jets_taus': {
-        'name': 'sum_pt_ratio_jets_taus', 
-        'root': 'P^{jj}_{T}/P^{#tau#tau}_{T}',
-        'type': 'f',
-        'units' : '',
-        'bins': 40,
-        'range': (0. , 30.)
-        },
-
-
-    'vector_sum_pt_ratio_jets_taus': {
-        'name': 'vector_sum_pt_ratio_jets_taus', 
-        'root': '#vec{P}^{jj}_{T}/#vec{P}^{#tau#tau}_{T}',
-        'type': 'f',
-        'units' : '',
-        'bins': 40,
-        'range': (0. , 30.)
-        },
+    # 'sum_pt_ratio_jets_taus': {
+    #     'name': 'sum_pt_ratio_jets_taus', 
+    #     'root': 'P^{jj}_{T}/P^{#tau#tau}_{T}',
+    #     'type': 'f',
+    #     'units' : '',
+    #     'bins': 40,
+    #     'range': (0. , 30.)
+    #     },
 
 
-    'dR_ratio_jets_taus': {
-        'name': 'dR_ratio_jets_taus', 
-        'root': 'dR_{jj} / dR_{#tau#tau}',
-        'type': 'f',
-        'units' : '',
-        'bins': 40,
-        'range': (0. , 10.)
-        },
-    'sum_pt_ratio_full_tausMET': {
-        'name': 'sum_pt_ratio_full_tausMET', 
-        'root': 'P^{Full}_{T} / P^{#tau#tau MET}_{T}',
-        'type': 'f',
-        'units' : '',
-        'bins': 40,
-        'range': (0. , 10.)
-        },
+    # 'vector_sum_pt_ratio_jets_taus': {
+    #     'name': 'vector_sum_pt_ratio_jets_taus', 
+    #     'root': '#vec{P}^{jj}_{T}/#vec{P}^{#tau#tau}_{T}',
+    #     'type': 'f',
+    #     'units' : '',
+    #     'bins': 40,
+    #     'range': (0. , 30.)
+    #     },
+
+
+    # 'dR_ratio_jets_taus': {
+    #     'name': 'dR_ratio_jets_taus', 
+    #     'root': 'dR_{jj} / dR_{#tau#tau}',
+    #     'type': 'f',
+    #     'units' : '',
+    #     'bins': 40,
+    #     'range': (0. , 10.)
+    #     },
+    # 'sum_pt_ratio_full_tausMET': {
+    #     'name': 'sum_pt_ratio_full_tausMET', 
+    #     'root': 'P^{Full}_{T} / P^{#tau#tau MET}_{T}',
+    #     'type': 'f',
+    #     'units' : '',
+    #     'bins': 40,
+    #     'range': (0. , 10.)
+    #     },
 
 
 

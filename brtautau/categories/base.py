@@ -8,15 +8,13 @@ class CategoryMeta(type):
     CATEGORY_REGISTRY = {}
     def __new__(cls, name, bases, dct):
         if name in CategoryMeta.CATEGORY_REGISTRY:
-            raise ValueError("Multiple categories with the same name: %s" % name)
+           raise ValueError("Multiple categories with the same name: %s" % name)
         cat = type.__new__(cls, name, bases, dct)
         # register the category
         CategoryMeta.CATEGORY_REGISTRY[name] = cat
         return cat
 
-
 class Category(object):
-
     __metaclass__ = CategoryMeta
 
     cuts = Cut()

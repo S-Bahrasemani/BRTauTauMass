@@ -21,6 +21,7 @@ if __name__ == "__main__":
     parser.add_argument('--logy', default=False, action='store_true')
     parser.add_argument('--cut', default=None, type=str, help='additional cut to apply')
     parser.add_argument('--mode', default='VBF', type=str, choices=['VBF', 'gg'])
+    parser.add_argument('--level', default='truth', type=str, choices=['reco', 'truth'])
 
     args = parser.parse_args()
 
@@ -37,21 +38,21 @@ if __name__ == "__main__":
             raise RuntimeError('Wrong key (see variables.py)')
 
 
-    higgs_100 = Higgs(mass=100, mode=args.mode)
-    higgs_125 = Higgs(mass=125, mode=args.mode)
-    higgs_150 = Higgs(mass=150, mode=args.mode)
+    higgs_100 = Higgs(mass=100, mode=args.mode, level = args.level, treename='tau')
+    higgs_125 = Higgs(mass=125, mode=args.mode, level= args.level)
+    higgs_150 = Higgs(mass=150, mode=args.mode, level = args.level)
 
     field_hists = higgs_100.get_field_hist(vars)
     hists_100 = higgs_100.get_hist_array(field_hists, cat, cuts=args.cut)
-    hists_125 = higgs_125.get_hist_array(field_hists, cat, cuts=args.cut)
-    hists_150 = higgs_150.get_hist_array(field_hists, cat, cuts=args.cut)
+  #  hists_125 = higgs_125.get_hist_array(field_hists, cat, cuts=args.cut)
+ #   hists_150 = higgs_150.get_hist_array(field_hists, cat, cuts=args.cut)
 
     for field, _ in field_hists.items():
         h_100 = hists_100[field]
-        h_125 = hists_125[field]
-        h_150 = hists_150[field]
+        #h_125 = hists_125[field]
+        #h_150 = hists_150[field]
 
-        plot = draw_hists([h_100, h_125, h_150], field, cat, logy=args.logy, unit_area=True)
+        plot = draw_hists(h_100, field, cat, logy=args.logy, unit_area=True)
         log.info(plot)
         if args.logy:
             plot.SaveAs(os.path.join('plots', 'lineshape_'+field+'_'+cat.name+'_logy.png'))

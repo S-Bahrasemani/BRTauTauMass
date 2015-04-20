@@ -2,6 +2,11 @@ import logging
 import os
 import rootpy
 
+MMC_VERSION = 1
+MMC_MASS = 'mmc%d_resonance_m' % MMC_VERSION
+MMC_PT = 'mmc%d_resonance_pt' % MMC_VERSION
+Coll_MASS = 'mass_collinear_tau1_tau2'
+
 DEFAULT_STUDENT = 'flat'
 DEFAULT_TREE = 'Tree'
 NTUPLE_PATH = 'ntuples'

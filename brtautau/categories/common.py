@@ -3,6 +3,7 @@ from math import pi
 
 from .base import Category
 from .. import MMC_MASS
+from .. import Coll_MASS
 # All basic cut definitions are here
 
 TAU1_MEDIUM = Cut('tau1_JetBDTSigMedium==1')
@@ -13,6 +14,21 @@ TAU2_TIGHT = Cut('tau2_JetBDTSigTight==1')
 ID_MEDIUM = TAU1_MEDIUM & TAU2_MEDIUM
 ID_TIGHT = TAU1_TIGHT & TAU2_TIGHT
 ID_MEDIUM_TIGHT = (TAU1_MEDIUM & TAU2_TIGHT) | (TAU1_TIGHT & TAU2_MEDIUM)
+
+
+## LEPHAD basic cut definitions, tau1 is hadronic and tau2 is lepton 
+
+TAU1_Positive = Cut('tau1_charge ==1')
+TAU1_Negative = Cut('tau1_charge ==-1')
+TAU2_Positive = Cut('tau2_charge ==1')
+TAU2_Negative = Cut('tau2_charge ==-1')
+
+TAU2_ISO_LEP = Cut('tau2_is_isolated_lep ==1')
+MT = Cut('tarnsverse_mass_tau1_tau2 < 70000')
+TAU_BJET = Cut('is_tau_b_jet')
+
+TAU_MEDIUM_LEP_ISO = TAU1_TIGHT & TAU2_ISO_LEP 
+
 # ID cuts for control region where both taus are medium but not tight
 ID_MEDIUM_NOT_TIGHT = (TAU1_MEDIUM & -TAU1_TIGHT) & (TAU2_MEDIUM & -TAU2_TIGHT)
 
@@ -44,9 +60,20 @@ PRESELECTION = (
     & ID_MEDIUM_TIGHT
     & MET
     & Cut('%s > 0' % MMC_MASS)
+    & Cut('%s > 0' % Coll_MASS)
     & DR_TAUS
     & TAU_SAME_VERTEX
     )
+
+
+
+
+PRESELECTION_LH = (
+    
+
+)
+
+
 
 # VBF category cuts
 CUTS_VBF = (
@@ -93,6 +120,10 @@ class Category_Preselection(Category):
         & Cut(MET_CENTRALITY.format(pi / 4))
         )
 
+
+class Category_Preselection_LH(Category):
+    name = 'preselection'
+    label = '#tau_{lep}#tau_{had} Preselection'
 
 class Category_Preselection_DEta_Control(Category_Preselection):
     is_control = True

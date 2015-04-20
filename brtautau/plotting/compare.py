@@ -345,6 +345,7 @@ def draw_hists(
     hists[0].yaxis.title = 'Arbitrary Unit'
 
     y_max = get_ymax(hists)
+    print y_max
     hists[0].yaxis.SetRangeUser(0., 1.05 * y_max) 
     hists[0].Draw('HIST')
 

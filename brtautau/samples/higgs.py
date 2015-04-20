@@ -10,16 +10,17 @@ class Signal(Sample):
 class Higgs(Signal):
 
     MASSES = range(60, 205, 5)
-    MODES = ['gg', 'VBF']
+    MODES = ['gg', 'VBF', 'Z']
     LEVELS = ['truth', 'reco']
     def __init__(self, e_com=13, 
                  mode=None, modes=None,
                  mass=None, masses=None,
+                 level = None, levels = None,
                  ntuple_path=NTUPLE_PATH,
                  student=DEFAULT_STUDENT,
+                 file_name = None,
                  suffix='_test',
-                 prefix =None,
-                label=None,
+                 label=None,
                  **kwargs):
         """
         Parameters
@@ -28,6 +29,22 @@ class Higgs(Signal):
         * mass: Mass of the Higgs boson
         * mode: production mode (VBF/gg)
         """
+        ## Adding reco level block --SINA
+
+        if levels is None:
+            if level is not None:
+                assert level in Higgs.LEVELS
+                levels = [level]
+            else:
+                levels = Higgs.LEVELS
+
+        else:
+            assert len(levels) > 0
+            for level in levels:
+                assert level in Higgs.LEVELS
+            assert len(set(levels)) == len(levels)
+
+
         if masses is None:
             if mass is not None:
                 assert mass in Higgs.MASSES
@@ -55,6 +72,12 @@ class Higgs(Signal):
             assert len(set(modes)) == len(modes)
             
         name = 'Signal'
+#### --SINA
+        str_level = ''
+        if len(levels) == 1:
+            str_level = levels[0]
+            name += '_%s' % str_level
+
         
         str_mode = ''
         if len(modes) == 1:
@@ -67,22 +90,24 @@ class Higgs(Signal):
             name += '_%s' % str_mass
 
         if label is None:
-            label = '%s#font[52]{H}(%s)#rightarrow#tau#tau' % (
-                str_mode, str_mass)
+            label = '%s-%s#font[52]{H}(%s)#rightarrow#tau#tau' % (
+                str_level, str_mode, str_mass)
 
         super(Higgs, self).__init__(name=name, label=label, **kwargs)
         self._sub_samples = []
         self._scales = []
-        for mode in modes:
-            for mass in masses:
-                self._sub_samples.append(Signal(
-                        ntuple_path=ntuple_path, 
-                        student='weighted.flat_%s_%s' % (mode, mass),
-                        suffix=suffix,
-                        name='Higgs_%s_%s' % (mode, mass), 
-                        label='Higgs_%s_%s' % (mode, mass)))
-                # Add all sample with a scale of 1
-                self._scales.append(1)
+        for level in levels:
+            for mode in modes:
+                for mass in masses:                    
+                    self._sub_samples.append(Signal(
+                            ntuple_path=ntuple_path, 
+                            student='%s_%s_%s' % (level, mode, mass),
+                            suffix=suffix,
+                            level = level,
+                            name='%s_Higgs_%s_%s' % (level, mode, mass), 
+                            label='%s_Higgs_%s_%s' % (level, mode, mass)))
+                    # Add all sample with a scale of 1
+                    self._scales.append(1)
 
 
     @property

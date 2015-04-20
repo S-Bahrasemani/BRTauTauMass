@@ -15,10 +15,13 @@ from rootpy.extern.argparse import ArgumentParser
 parser = ArgumentParser()
 parser.add_argument('--mode', default='gg', type=str, choices=['VBF', 'gg'])
 parser.add_argument('--dry', action='store_true', default=False)
+parser.add_argument('--level', default='truth', type=str, choices=['truth', 'reco'])
 args = parser.parse_args()
 
 my_datetime = datetime.date.today()
 my_datetime = my_datetime.strftime("%m%d%Y")
+
+channels=['hadhad', 'lephad', 'leplep']
 class Regressor(TMVA.Factory):
     """
     """
@@ -71,7 +74,7 @@ class Regressor(TMVA.Factory):
         # params += ["nEventsMin={0}".format(nEventsMin)]
         log.info(params)
 
-        method_name =   "BRT_HiggsMass_"+str(args.mode) +'_' + str(my_datetime) 
+        method_name =   "BRT_HiggsMass-" + str(my_datetime)+'_' + str(args.level)+'_' +str(args.mode)+'_'+ channels[1] 
         params_string = "!H:V"
         for param in params:
             params_string+= ":"+param
@@ -80,16 +83,15 @@ class Regressor(TMVA.Factory):
             method_name,
             params_string)
 
-    def train(self, mode='gg', **kwargs):
+    def train(self, mode='gg',level='truth', **kwargs):
         """
         Run, Run !
         """
         self.set_variables()
-        
+    
+        higgs_array = Higgs(tree_name= 'Tree', mode=mode, level=level, masses=Higgs.MASSES, suffix='_train')
 
-        higgs_array = Higgs(mode=mode, masses=Higgs.MASSES, suffix='_train')
-
-        cut = Cut('hadhad==1')
+        cut = Cut('lephad==1')
         
         params = ['nTrain_Regression=0']
         params += ['nTest_Regression=1']
