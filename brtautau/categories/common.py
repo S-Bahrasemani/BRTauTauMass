@@ -16,24 +16,27 @@ ID_TIGHT = TAU1_TIGHT & TAU2_TIGHT
 ID_MEDIUM_TIGHT = (TAU1_MEDIUM & TAU2_TIGHT) | (TAU1_TIGHT & TAU2_MEDIUM)
 
 
-## LEPHAD basic cut definitions, tau1 is hadronic and tau2 is lepton 
+## LEPHAD basic cut definitions, tau1 is hadronic and tau2 is lepton-- LH Brnches names are different Be carefull 
+TAU_MEDIUM = Cut('evtsel_tau_is_Medium')
+TAU_Positive = Cut('evtsel_tau_charge ==1')
+TAU_Negative = Cut('evtsel_tau_charge ==-1')
+LEP_Positive = Cut('evtsel_lep_charge ==1')
+LEP_Negative = Cut('evtsel_lep_charge ==-1')
 
-TAU1_Positive = Cut('tau1_charge ==1')
-TAU1_Negative = Cut('tau1_charge ==-1')
-TAU2_Positive = Cut('tau2_charge ==1')
-TAU2_Negative = Cut('tau2_charge ==-1')
-
-TAU2_ISO_LEP = Cut('tau2_is_isolated_lep ==1')
+ISO_LEP = Cut('evtsel_is_isoLep')
 MT = Cut('tarnsverse_mass_tau1_tau2 < 70000')
-TAU_BJET = Cut('is_tau_b_jet')
+BJET = Cut('is_tau_b_jet ==0')
 
-TAU_MEDIUM_LEP_ISO = TAU1_TIGHT & TAU2_ISO_LEP 
+
+TAU_MEDIUM_LEP_ISO = TAU_MEDIUM  & ISO_LEP 
+OS_TAU_LEP = (TAU_Positive & LEP_Negative) | (TAU_Negative & LEP_Positive)
+
+## NO B jet with Pt > 30 GeV
 
 # ID cuts for control region where both taus are medium but not tight
 ID_MEDIUM_NOT_TIGHT = (TAU1_MEDIUM & -TAU1_TIGHT) & (TAU2_MEDIUM & -TAU2_TIGHT)
 
 TAU_SAME_VERTEX = Cut('tau_same_vertex')
-
 LEAD_TAU_35 = Cut('tau1_pt > 35000')
 SUBLEAD_TAU_25 = Cut('tau2_pt > 25000')
 
@@ -51,6 +54,14 @@ DETA_TAUS = Cut('dEta_tau1_tau2 < 1.5')
 DETA_TAUS_CR = Cut('dEta_tau1_tau2 > 1.5')
 RESONANCE_PT = Cut('resonance_pt > 100000')
 
+
+## LEPHAD specific cuts:
+
+TAU_PT = Cut('tau1_pt > 20000.')
+LEP_PT = Cut('tau2_pt > 12000.')
+MT = Cut('transverse_mass_tau1_tau2 < 70000')
+
+DPHI_MIN_TAUS_MET = Cut ('dPhi_min_tau_MET <{}'.format( pi / 4))
 # use .format() to set centality value
 MET_CENTRALITY = 'MET_bisecting || (dPhi_min_tau_MET < {0})'
 
@@ -62,17 +73,28 @@ PRESELECTION = (
     & Cut('%s > 0' % MMC_MASS)
     & Cut('%s > 0' % Coll_MASS)
     & DR_TAUS
+    & DETA_TAUS
+    & DPHI_MIN_TAUS_MET
     & TAU_SAME_VERTEX
     )
 
+## LEPHAD Cuts
+PRESELECTION_LH =(
+    TAU_MEDIUM_LEP_ISO 
+    & TAU_PT
+    & LEP_PT
+    & MT
+    & OS_TAU_LEP
+    & Cut('%s > 0' % MMC_MASS)
+    & Cut('%s > 0' % Coll_MASS)
+    )
 
 
-
-PRESELECTION_LH = (
-    
-
-)
-
+CUTS_VBF_LH = (
+    CUTS_2J
+    & Cut('dEta_jets > 3.')
+    & Cut('mass_vis_tau1_tau2 > 40000')
+    )
 
 
 # VBF category cuts
@@ -124,6 +146,8 @@ class Category_Preselection(Category):
 class Category_Preselection_LH(Category):
     name = 'preselection'
     label = '#tau_{lep}#tau_{had} Preselection'
+    common_cuts = PRESELECTION_LH
+
 
 class Category_Preselection_DEta_Control(Category_Preselection):
     is_control = True

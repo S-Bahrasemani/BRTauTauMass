@@ -25,14 +25,14 @@ for feat in FEATURES:
        brt_input_variables[feat] = array.array('f', [-1.])
        brt_reader.AddVariable(feat, brt_input_variables[feat])
        
-brt_reader.BookMVA("TMVARegression_BRT_HiggsMass-04112015_truth_VBF_lephad", "./RESULTS/TMVARegression_BRT_HiggsMass-04112015_truth_VBF_lephad.weights.xml")
+brt_reader.BookMVA("TMVARegression_BRT_HiggsMass-04112015_truth_gg_lephad", "./RESULTS/TMVARegression_BRT_HiggsMass-04112015_truth_gg_lephad.weights.xml")
 
 def evaluate_brt(tree, reader, feats):
        # log.debug('------------------')
        for f in feats.keys():
               feats[f][0] = getattr(tree, f)
        # log.debug(feats)
-       mass = reader.EvaluateMVA('TMVARegression_BRT_HiggsMass-04112015_truth_VBF_lephad')
+       mass = reader.EvaluateMVA('TMVARegression_BRT_HiggsMass-04112015_truth_gg_lephad')
        # log.debug('BRT MASS = %s' % mass)
        return mass
 

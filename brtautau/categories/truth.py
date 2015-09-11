@@ -1,3 +1,5 @@
+import math
+from math import pi
 from rootpy.tree import Cut
 
 from .base import Category
@@ -13,16 +15,36 @@ HADHAD = Cut('hadhad == 1')
 LEPHAD = Cut('lephad ==1')
 TAU1_ETA = Cut('abs(tau1_eta) < 2.5')
 TAU2_ETA = Cut('abs(tau2_eta) < 2.5')
-TAU1_PT = Cut('tau1_pt > 15000.')
-TAU2_PT = Cut('tau2_pt > 15000.')
-MET = Cut('evtsel_MET > 20000.')
+TAU1_PT = Cut('tau1_pt > 35000.')
+TAU2_PT = Cut('tau2_pt > 25000.')
+
+MET = Cut('MET_et > 20000.') ## evtsel_MET 
+DR_TAUS = Cut('0.8 < dR_tau1_tau2 < 2.4')
+DETA_TAUS = Cut('dEta_tau1_tau2 < 1.5')
+DPHI_MIN_TAUS_MET = Cut ('dPhi_min_tau_MET < {}'.format( pi / 4))
+
+## LEPHAD specific cuts
+MT = Cut('transverse_mass_tau1_tau2 < 70000')
+TAU_PT = Cut("tau1_pt > 20000. ")
+LEP_PT = Cut("tau2_pt > 12000.")
 
 PRESELECTION = (
     HADHAD 
-    & TAU1_ETA & TAU2_ETA
+    & DETA_TAUS
+    & DR_TAUS
     & TAU1_PT & TAU2_PT
     & MET
+    & DPHI_MIN_TAUS_MET
     )
+
+
+PRESELECTION_LH = (
+    LEPHAD 
+    & TAU1_ETA & TAU2_ETA
+    & TAU_PT & LEP_PT
+    & MT
+    )
+
 
 
 CUTS_TRUE_VBF = (
@@ -44,8 +66,13 @@ CUTS_TRUE_VBF_CUTBASED = (
     & TRUE_JETS_MASS
     ) 
 
-# class Category_Preselection(Category):
-#     name = 'preselection'
-#     label = '#tau_{had}#tau_{had} Preselection'
-#     common_cuts = PRESELECTION
+class Category_Preselection_TH(Category):
+    name = 'preselection'
+    label = '#tau_{had}#tau_{had} Preselection'
+    common_cuts = PRESELECTION
+ 
+class Category_Preselection_TH_LH(Category):
+    name = 'preselection'
+    label = '#tau_{lep}#tau_{had} Preselection'
+    common_cuts = PRESELECTION_LH
  

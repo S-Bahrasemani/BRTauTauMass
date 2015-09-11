@@ -7,15 +7,15 @@ def get_label(variable):
 
 
 VARIABLES = {
-    'resonance_m': {
-        'name': 'resonance_m',
-        'root': 'm_{H}',
-        'type': 'f',
-        'units': 'GeV',
-        'scale': 0.001,
-        'bins': 30,
-        'range': (50, 200)
-        },
+    # 'resonance_m': {
+    #     'name': 'resonance_m',
+    #     'root': 'm_{H}',
+    #     'type': 'f',
+    #     'units': 'GeV',
+    #     'scale': 0.001,
+    #     'bins': 30,
+    #     'range': (50, 200)
+    #     },
 
     'mass_vis_tau1_tau2' : {
         'name': 'mass_vis_tau1_tau2',
@@ -70,7 +70,7 @@ VARIABLES = {
 
     'tau1_eta': {
         'name': 'tau1_eta',
-        'root': 'Leading tau #eta',
+        'root': '#eta_{#tau_{1}}',
         'type': 'f',
         'bins': 20,
         'range': (-2.5, 2.5)
@@ -78,7 +78,7 @@ VARIABLES = {
 
     'tau2_eta': {
         'name': 'tau2_eta',
-        'root': ' #tau2_{ #eta}',
+        'root': ' #eta_{ #tau_{2}}',
         'type': 'f',
         'bins': 20,
         'range': (-2.5, 2.5)
@@ -88,14 +88,12 @@ VARIABLES = {
         'name': 'dEta_jets',
         'root': 'd#eta_{jj}',
         'type': 'f',
-        'bins': 20,
-        'range': (-10, 10)
+        'bins': 10,
+        'range': (0, 10)
         },
  
 
     
-    
-
     'dPhi_tau1_MET': {
         'name': 'dPhi_tau1_MET', 
         'root': '#Delta #phi(#tau1, MET)',
@@ -184,19 +182,19 @@ VARIABLES = {
         'type': 'f',
         'units': 'GeV',
         'scale': 0.001, 
-        'bins': 50,
-        'range': (0. , 1000.)
+        'bins': 30,
+        'range': (0. , 200.)
         },
 
+    ## not avilable in HAHHAD samples
 
-
-    'met_phi_centrality': {    
-        'name': 'met_phi_centrality', 
-        'root': 'MET_phi_centrality',
-        'type': 'f',
-        'bins': 20,
-        'range': (-3. , 3.)
-        },
+    # 'met_phi_centrality': {    
+    #     'name': 'met_phi_centrality', 
+    #     'root': 'MET_phi_centrality',
+    #     'type': 'f',
+    #     'bins': 20,
+    #     'range': (-3. , 3.)
+    #     },
 
 
 
@@ -216,7 +214,7 @@ VARIABLES = {
        'units' : 'GeV',
        'scale': 0.001,
         'bins': 30,
-        'range': (0. , 1000.)
+        'range': (0. , 300.)
         },
 
     'sum_pt_tau1_tau2_met': {
@@ -225,8 +223,8 @@ VARIABLES = {
         'type': 'f',
         'units' : 'GeV',
         'scale': 0.001,
-        'bins': 30,
-        'range': (0. , 1000.)
+        'bins': 40,
+        'range': (0. , 400.)
         },
 
 
@@ -253,8 +251,8 @@ VARIABLES = {
         'type': 'f',
         'units' : 'GeV',
         'scale': 0.001,
-        'bins': 50,
-        'range': (0. , 1000.)
+        'bins': 30,
+        'range': (0. , 300.)
         },
 
     'transverse_mass_tau2_met': {
@@ -263,8 +261,8 @@ VARIABLES = {
         'type': 'f',
         'units' : 'GeV',
         'scale': 0.001,
-        'bins': 50,
-        'range': (0. , 1000.)
+        'bins': 30,
+        'range': (0. , 300.)
         },
 
 
@@ -275,8 +273,8 @@ VARIABLES = {
         'type': 'f',
         'units' : 'GeV',
         'scale': 0.001,
-        'bins': 50,
-        'range': (0. , 1000.)
+        'bins': 30,
+        'range': (0. , 300.)
         },
 
     'vector_sum_pt_tau1_tau2': {

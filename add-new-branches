@@ -15,7 +15,7 @@ import array
 from brtautau.parallel import run_pool
 from brtautau.categories.features import FEATURES 
 log = logging.getLogger('apply-bdt-weights')
-
+  
 class Model(TreeModel):
    
    ### FOR HH reco

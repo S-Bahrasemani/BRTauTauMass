@@ -346,7 +346,7 @@ def draw_hists(
 
     y_max = get_ymax(hists)
     print y_max
-    hists[0].yaxis.SetRangeUser(0., 1.05 * y_max) 
+    hists[0].yaxis.SetRangeUser(0., 0.0001+ 1.05 * y_max) 
     hists[0].Draw('HIST')
 
     colors = ['black', 'red', 'orange', 'blue', 'green', 'purple', 'yellow', 'pink',]
