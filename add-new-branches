@@ -18,58 +18,37 @@ log = logging.getLogger('apply-bdt-weights')
   
 class Model(TreeModel):
    
-   ### FOR HH reco
-
-   # transverse_mass_tau1_tau2 = FloatCol()
-   # transverse_mass_tau1_met= FloatCol()
-   # transverse_mass_tau2_met = FloatCol()
-   # pt_diff_tau1_tau2 = FloatCol()
-   # sum_pt_tau1_tau2 = FloatCol()
-   # sum_pt_tau1_tau2_met = FloatCol()
-   # vector_sum_pt_tau1_tau2 = FloatCol()
-   # vector_sum_pt_tau1_tau2_met = FloatCol()
-   # dPhi_tau1_tau2_MET = FloatCol()
-
-    # mass_ratio_jets_taus = FloatCol()
-    # sum_pt_ratio_jets_taus = FloatCol()
-    # vector_sum_pt_ratio_jets_taus = FloatCol()
-    # sum_pt_ratio_full_tausMET = FloatCol()
-    # dR_ratio_jets_taus = FloatCol()
-
-   ### FOR NEW RECO LEPHAD SAMPLES ##
-
-   tau1_pt =FloatCol()
-   tau1_eta =FloatCol()
-   tau1_phi =FloatCol()
-   tau1_m =FloatCol()
+   # tau1_pt =FloatCol()
+   # tau1_eta =FloatCol()
+   # tau1_phi =FloatCol()
+   # tau1_m =FloatCol()
  
-   tau2_pt =FloatCol()
-   tau2_eta =FloatCol()
-   tau2_phi =FloatCol()
-   tau2_m =FloatCol()
+   # tau2_pt =FloatCol()
+   # tau2_eta =FloatCol()
+   # tau2_phi =FloatCol()
+   # tau2_m =FloatCol()
    
+
+   # jet1_pt =FloatCol(default=-999.)
+   # jet1_eta =FloatCol(default=-999.)
+   # jet1_phi =FloatCol(default=-999.)
+   # jet1_m =FloatCol(default=-999.)
+
+   # jet2_pt =FloatCol(default=-999.)
+   # jet2_eta =FloatCol(default=-999.)
+   # jet2_phi =FloatCol(default=-999.)
+   # jet2_m =FloatCol(default=-999.)
+
+   # jet3_pt =FloatCol(default=-999.)
+   # jet3_eta =FloatCol(default=-999.)
+   # jet3_phi =FloatCol(default=-999.)
+   # jet3_m =FloatCol(default=-999.)
+
    MET_et = FloatCol()
    MET_phi = FloatCol()
 
-   jet1_pt =FloatCol(default=-999.)
-   jet1_eta =FloatCol(default=-999.)
-   jet1_phi =FloatCol(default=-999.)
-   jet1_m =FloatCol(default=-999.)
-
-   jet2_pt =FloatCol(default=-999.)
-   jet2_eta =FloatCol(default=-999.)
-   jet2_phi =FloatCol(default=-999.)
-   jet2_m =FloatCol(default=-999.)
-
-   jet3_pt =FloatCol(default=-999.)
-   jet3_eta =FloatCol(default=-999.)
-   jet3_phi =FloatCol(default=-999.)
-   jet3_m =FloatCol(default=-999.)
-
-
    
-   ## Taus Block
-
+   ## Di-tau block
    dR_tau1_tau2 = FloatCol()
    dEta_tau1_tau2 = FloatCol()
    dPhi_tau1_tau2 = FloatCol()
@@ -97,12 +76,7 @@ class Model(TreeModel):
    tau_pt_ratio = FloatCol()
    met_phi_centrality = FloatCol()
    pt_diff_tau1_tau2 = FloatCol()
-   
-    # tau1, tau2, met, jet1, jet2 variables
    sum_pt = FloatCol()
-   #sum_pt_full = FloatCol(default =-999.)
-   #vector_sum_pt  = FloatCol(default=-999.)
-  #vector_sum_pt_full = FloatCol(default =-999.)
    
    true_resonance_pt = FloatCol()
    resonance_pt = FloatCol()
@@ -110,9 +84,20 @@ class Model(TreeModel):
    ### JETS KINEMATICS
 
    dEta_jets = FloatCol(default=-999.)
+   dEta_jet1_jet2 = FloatCol(default=-999.)
    eta_product_jets = FloatCol(default=-999.)
-   #eta_product_jets_boosted = FloatCol(default=-999.)
    mass_jet1_jet2 = FloatCol(default=-999.)
+
+   #eta_product_jets_boosted = FloatCol(default=-999.)
+   # mass_ratio_jets_taus = FloatCol()
+   # sum_pt_ratio_jets_taus = FloatCol()
+   # vector_sum_pt_ratio_jets_taus = FloatCol()
+   # sum_pt_ratio_full_tausMET = FloatCol()
+   # dR_ratio_jets_taus = FloatCol()
+   #sum_pt_full = FloatCol(default =-999.)
+   #vector_sum_pt  = FloatCol(default=-999.)
+   #vector_sum_pt_full = FloatCol(default =-999.)
+   
    
    ### EVENT 
    mmc1_resonance_m = FloatCol()
@@ -194,39 +179,19 @@ def add_new_branches(tree):
    branch33 = tree.GetBranch('tau_pt_ratio') 
    branch34 = tree.GetBranch('met_phi_centrality') 
    branch35 = tree.GetBranch('pt_diff_tau1_tau2') 
-   
-    # tau1, tau2, met, jet1, jet2 variables
    branch36 = tree.GetBranch('sum_pt') 
    branch37 = tree.GetBranch('sum_pt_full') 
-   
    branch38 = tree.GetBranch('true_resonance_pt') 
    branch39 = tree.GetBranch('resonance_pt') 
 
    ### JETS KINEMATICS
-
    branch40 = tree.GetBranch('dEta_jets')
+   branch400 = tree.GetBranch('dEta_jet1_jet2')
    branch41 = tree.GetBranch('eta_product_jets') 
    branch42 = tree.GetBranch('mass_jet1_jet2') 
-   
 
-  
-   #### for HH reco
-   # branch1 = tree.GetBranch('transverse_mass_tau1_tau2')
-   # branch2 = tree.GetBranch('transverse_mass_tau1_met')
-   # branch3 = tree.GetBranch('transverse_mass_tau2_met')
-   # branch4 = tree.GetBranch('pt_diff_tau1_tau2')
-   # branch5 = tree.GetBranch('sum_pt_tau1_tau2')
-   # branch6 = tree.GetBranch('sum_pt_tau1_tau2_met')
-  
-   # branch7 = tree.GetBranch('vector_sum_pt_tau1_tau2')
-   # branch8 = tree.GetBranch('vector_sum_pt_tau1_tau2_met')
-   # branch9 = tree.GetBranch('dPhi_tau1_tau2_MET')
-   # branch1 = tree.GetBranch('mass_ratio_jets_taus')
-   # branch2 = tree.GetBranch('sum_pt_ratio_jets_taus')
-   # branch3 = tree.GetBranch('vector_sum_pt_ratio_jets_taus')
-   # branch4 = tree.GetBranch('sum_pt_ratio_full_tausMET')
-   # branch5 = tree.GetBranch('dR_ratio_jets_taus')
-
+   ## change tree'e name
+   tree.set_name("Tree")
 
    for event in tree:
 
@@ -234,50 +199,36 @@ def add_new_branches(tree):
       # MVIS_3P = 1.2
       # MVIS_EL = 0.000510999
       # MVIS_MU = 0.105658367
-
-
       
-      if event.evtsel_tau_numTrack == 1:
-         tau_m = 0.8
+      if event.tau1_n_tracks == 1:
+         tau1_m = 0.8
       else:
-         tau_m = 1.2
+         tau1_m = 1.2
       tau1 = ROOT.TLorentzVector()
-      tau1.SetPtEtaPhiM(1000*event.evtsel_tau_et, event.evtsel_tau_eta, event.evtsel_tau_phi,1000*tau_m)        
-      
-      if event.evtsel_is_eltau ==1  or  event.evtsel_is_el ==1:
-         lep_m = 0.000510999
-      else: 
-         lep_m = 0.105658367
+      tau1.SetPtEtaPhiM(event.tau1_pt, event.tau1_eta, event.tau1_phi,1000*tau1_m)        
      
+      if event.tau2_n_tracks == 1:
+         tau2_m = 0.8
+      else:
+         tau2_m = 1.2
       tau2 = ROOT.TLorentzVector()
-      tau2.SetPtEtaPhiM(1000*event.evtsel_lep_pt, event.evtsel_lep_eta, event.evtsel_lep_phi,1000*lep_m)
+      tau2.SetPtEtaPhiM(event.tau2_pt, event.tau2_eta, event.tau2_phi,1000*tau2_m)        
+      
       taus = tau1 + tau2
-
       MET = ROOT.TVector2()
-      MET.SetMagPhi(1000*event.evtsel_MET, event.evtsel_MET_phi)
+      MET.SetMagPhi(event.met_et, event.met_phi)
       
 
       jet1 = ROOT.TLorentzVector()
-      if event.evtsel_jet_leading_pt != -1:
-         jet1.SetPtEtaPhiM(1000*event.evtsel_jet_leading_pt, event.evtsel_jet_leading_eta, event.evtsel_jet_leading_phi, 1000*event.evtsel_jet_leading_m)        
-      else:
-         jet1.SetPtEtaPhiM(event.evtsel_jet_leading_pt, event.evtsel_jet_leading_eta, event.evtsel_jet_leading_phi,event.evtsel_jet_leading_m)        
-         
+      jet1.SetPtEtaPhiM(event.jet1_pt, event.jet1_eta, event.jet1_phi, event.jet1_m)        
+  
       jet2 = ROOT.TLorentzVector()
-      if event.evtsel_jet_leading_pt != -1:
-         jet2.SetPtEtaPhiM(1000*event.evtsel_jet_subleading_pt, event.evtsel_jet_subleading_eta, event.evtsel_jet_subleading_phi, 1000*event.evtsel_jet_subleading_m)
-      else:
-         jet2.SetPtEtaPhiM(event.evtsel_jet_subleading_pt, event.evtsel_jet_subleading_eta, event.evtsel_jet_subleading_phi, event.evtsel_jet_subleading_m)
-         
-      jet3 = ROOT.TLorentzVector()
-      if event.evtsel_jet_third_pt != -1:
-         jet3.SetPtEtaPhiM(1000*event.evtsel_jet_third_pt, event.evtsel_jet_third_eta, event.evtsel_jet_third_phi, 1000*event.evtsel_jet_third_m)        
-      else:
-         jet3.SetPtEtaPhiM(event.evtsel_jet_third_pt, event.evtsel_jet_third_eta, event.evtsel_jet_third_phi,event.evtsel_jet_third_m)        
-         
-      tree.hadhad = 0
+      jet2.SetPtEtaPhiM(event.jet2_pt, event.jet2_eta, event.jet2_phi, event.jet2_m)        
+      
+      #### Fill branches:
+      tree.hadhad = 1
       br1.Fill()
-      tree.lephad = 1
+      tree.lephad = 0
       br2.Fill()
       tree.leplep = 0
       br3.Fill()
@@ -286,101 +237,101 @@ def add_new_branches(tree):
       br4.Fill()
       tree.MET_phi = MET.Phi()
       br5.Fill()
-      tree.mmc1_resonance_m = 1000*event.evtsel_ditau_MMC
+      tree.mmc1_resonance_m = event.tau_tau_mmc_mlnu3p_m
       br6.Fill()
-      tree.numJets = event.evtsel_jets_num
+      tree.numJets = event.n_jets
       br7.Fill()
       
-      tree.tau1_pt = tau1.Pt()
-      branch1.Fill()
-      tree.tau1_eta = tau1.Eta()
-      branch2.Fill()
-      tree.tau1_phi = tau1.Phi()
-      branch3.Fill()
-      tree.tau1_m = tau1.M()
-      branch4.Fill()
+      # tree.tau1_pt = tau1.Pt()
+      # branch1.Fill()
+      # tree.tau1_eta = tau1.Eta()
+      # branch2.Fill()
+      # tree.tau1_phi = tau1.Phi()
+      # branch3.Fill()
+      # tree.tau1_m = tau1.M()
+      # branch4.Fill()
 
-      tree.tau2_pt = tau2.Pt()
-      branch5.Fill()
-      tree.tau2_eta = tau2.Eta()
-      branch6.Fill()
-      tree.tau2_phi = tau2.Phi()
-      branch7.Fill()
-      tree.tau2_m = tau2.M()
-      branch8.Fill()
+      # tree.tau2_pt = tau2.Pt()
+      # branch5.Fill()
+      # tree.tau2_eta = tau2.Eta()
+      # branch6.Fill()
+      # tree.tau2_phi = tau2.Phi()
+      # branch7.Fill()
+      # tree.tau2_m = tau2.M()
+      # branch8.Fill()
 
-      if event.evtsel_jet_leading_pt !=-1:
-         tree.jet1_pt = 1000*event.evtsel_jet_leading_pt
-         branch9.Fill()
-      else :
-         tree.jet1_pt = event.evtsel_jet_leading_pt
-         branch9.Fill()
+      # if event.evtsel_jet_leading_pt !=-1:
+      #    tree.jet1_pt = event.evtsel_jet_leading_pt
+      #    branch9.Fill()
+      # else :
+      #    tree.jet1_pt = event.evtsel_jet_leading_pt
+      #    branch9.Fill()
 
-      tree.jet1_eta = event.evtsel_jet_leading_eta
-      branch10.Fill()
-      tree.jet1_phi = event.evtsel_jet_leading_phi
-      branch11.Fill()
+      # tree.jet1_eta = event.evtsel_jet_leading_eta
+      # branch10.Fill()
+      # tree.jet1_phi = event.evtsel_jet_leading_phi
+      # branch11.Fill()
       
-      if event.evtsel_jet_leading_pt !=-1:
-         tree.jet1_m = 1000*event.evtsel_jet_leading_m
-         branch12.Fill()
-      else:
-         tree.jet1_m = event.evtsel_jet_leading_m
-         branch12.Fill()
+      # if event.evtsel_jet_leading_pt !=-1:
+      #    tree.jet1_m = event.evtsel_jet_leading_m
+      #    branch12.Fill()
+      # else:
+      #    tree.jet1_m = event.evtsel_jet_leading_m
+      #    branch12.Fill()
 
 
-      if event.evtsel_jet_subleading_pt !=-1:
-         tree.jet2_pt = 1000*event.evtsel_jet_subleading_pt
-         branch92.Fill()
-      else:
-         tree.jet2_pt = event.evtsel_jet_subleading_pt
-         branch92.Fill()
+      # if event.evtsel_jet_subleading_pt !=-1:
+      #    tree.jet2_pt = event.evtsel_jet_subleading_pt
+      #    branch92.Fill()
+      # else:
+      #    tree.jet2_pt = event.evtsel_jet_subleading_pt
+      #    branch92.Fill()
          
-      tree.jet2_eta = event.evtsel_jet_subleading_eta
-      branch102.Fill()
-      tree.jet2_phi = event.evtsel_jet_subleading_phi
-      branch112.Fill()
-      if event.evtsel_jet_subleading_m !=-1:
-         tree.jet2_m = 1000*event.evtsel_jet_subleading_m
-         branch122.Fill()
-      else:
-         tree.jet2_m = event.evtsel_jet_subleading_m
-         branch122.Fill()
+      # tree.jet2_eta = event.evtsel_jet_subleading_eta
+      # branch102.Fill()
+      # tree.jet2_phi = event.evtsel_jet_subleading_phi
+      # branch112.Fill()
+      # if event.evtsel_jet_subleading_m !=-1:
+      #    tree.jet2_m = event.evtsel_jet_subleading_m
+      #    branch122.Fill()
+      # else:
+      #    tree.jet2_m = event.evtsel_jet_subleading_m
+      #    branch122.Fill()
      
-      if event.evtsel_jet_third_pt != -1:
-         tree.jet3_pt = 1000*event.evtsel_jet_third_pt
-         branch93.Fill()
-      else:
-         tree.jet3_pt = event.evtsel_jet_third_pt
-         branch93.Fill()
-      tree.jet3_eta = event.evtsel_jet_third_eta
-      branch103.Fill()
-      tree.jet3_phi = event.evtsel_jet_third_phi
-      branch113.Fill()
+      # if event.evtsel_jet_third_pt != -1:
+      #    tree.jet3_pt = event.evtsel_jet_third_pt
+      #    branch93.Fill()
+      # else:
+      #    tree.jet3_pt = event.evtsel_jet_third_pt
+      #    branch93.Fill()
+      # tree.jet3_eta = event.evtsel_jet_third_eta
+      # branch103.Fill()
+      # tree.jet3_phi = event.evtsel_jet_third_phi
+      # branch113.Fill()
 
-      if event.evtsel_jet_third_m !=-1:         
-         tree.jet3_m = 1000*event.evtsel_jet_third_m
-         branch123.Fill()
-      else:
-         tree.jet3_m = event.evtsel_jet_third_m
-         branch123.Fill()
-
+      # if event.evtsel_jet_third_m !=-1:         
+      #    tree.jet3_m = event.evtsel_jet_third_m
+      #    branch123.Fill()
+      # else:
+      #    tree.jet3_m = event.evtsel_jet_third_m
+      #    branch123.Fill()
+         
+      ##### Di-tau block
 
       tree.dR_tau1_tau2 = tau1.DeltaR(tau2)
       branch13.Fill()
       tree.dEta_tau1_tau2 = abs(tau1.Eta() - tau2.Eta())
       branch14.Fill()
-      tree.dPhi_tau1_tau2 = abs(tau1.DeltaPhi(tau2))
+      tree.dPhi_tau1_tau2 = event.tau_tau_dphi#deltaPhi(tau1.Phi()- tau2.Phi())
       branch15.Fill()
-
-      tree.dPhi_tau1_tau2_MET = deltaPhi(taus.Phi(), MET.Phi())
-      branch16.Fill()
-      tree.dPhi_tau1_MET = abs(deltaPhi(tau1.Phi(), MET.Phi()))
+      tree.dPhi_tau1_MET = event.tau_tau_dphi_tau1_met#deltaPhi(tau1.Phi(), MET.Phi())
       branch17.Fill()
-      tree.dPhi_tau2_MET = abs( deltaPhi(taus.Phi(), MET.Phi()))        
+      tree.dPhi_tau2_MET = event.tau_tau_dphi_tau2_met #deltaPhi(tau2.Phi(), MET.Phi()) 
       branch18.Fill()
       tree.dPhi_min_tau_MET = min(tree.dPhi_tau1_MET, tree.dPhi_tau2_MET)
       branch19.Fill()
+      tree.dPhi_tau1_tau2_MET =event.tau_tau_dphi_min_tau_met #min(tree.dPhi_tau1_MET, tree.dPhi_tau2_MET)
+      branch16.Fill()
 
       tree.vector_sum_pt_tau1_tau2 = taus.Pt()
       branch20.Fill()
@@ -390,7 +341,7 @@ def add_new_branches(tree):
       branch22.Fill()
       tree.sum_pt_tau1_tau2_met = event.tau1_pt + event.tau2_pt + MET.Mod()
       branch23.Fill()
-            
+        
       tree.transverse_mass_tau1_tau2 = math.sqrt(2*event.tau1_pt*event.tau2_pt*(1.-math.cos(tau1.DeltaPhi(tau2))))
       branch24.Fill()
       tree.transverse_mass_tau1_met = math.sqrt((MET.Mod() + event.tau1_pt)**2 - 
@@ -400,21 +351,12 @@ def add_new_branches(tree):
                                                 (MET.Px()*tau2.Px() + MET.Py()*tau2.Px() + MET.Px()*tau2.Py() + MET.Py()*tau2.Py()))
       branch26.Fill()
 
-      if event.jet1_pt !=-1:
-         tree.mass_tau1_tau2_jet1 = (tau1 + tau2 + jet1).M()
-         branch28.Fill()
-      else:
-         tree.mass_tau1_tau2_jet1 = -999.
-         branch28.Fill()
-      # m_vis, m_col, x1, x2 = collinearmass(
-      #    vis_tau1, vis_tau2, MET.X(), MET.Y())
-      
-      tree.mass_vis_tau1_tau2 = 1000*event.evtsel_ditau_visibleMass
+      tree.mass_vis_tau1_tau2 = event.tau_tau_vis_mass
       branch29.Fill()
-      tree.mass_collinear_tau1_tau2 = 1000*event.evtsel_ditau_collinearMass
+      tree.mass_collinear_tau1_tau2 = event.tau_tau_coll_approx_m
       branch30.Fill()
       
-      tree.theta_tau1_tau2 = math.sqrt((event.dR_tau1_tau2)**2 - (event.dEta_tau1_tau2)**2)
+      tree.theta_tau1_tau2 = abs(tau1.Theta() - tau2.Theta())
       branch31.Fill()
       tree.cos_theta_tau1_tau2 = math.cos(tree.theta_tau1_tau2)
       branch32.Fill()
@@ -425,18 +367,30 @@ def add_new_branches(tree):
       else:
          tree.tau_pt_ratio = 0
          branch33.Fill()
-      tree.met_phi_centrality = event.evtsel_met_phi_centrality
+      tree.met_phi_centrality = event.tau_tau_met_centrality
       branch34.Fill()
 
       tree.pt_diff_tau1_tau2 = math.sqrt((tau1.Px() - tau2.Px())**2+(tau1.Py() - tau2.Py())**2)/(event.tau1_pt+event.tau2_pt)
       branch35.Fill()   
       tree.sum_pt = tau1.Pt() + tau2.Pt() + MET.Mod()
       branch36.Fill()
+      
+      
+
+      if event.jet1_pt !=0:
+         tree.mass_tau1_tau2_jet1 = (tau1 + tau2 + jet1).M()
+         branch28.Fill()
+      else:
+         tree.mass_tau1_tau2_jet1 = -999.
+         branch28.Fill()
+      # m_vis, m_col, x1, x2 = collinearmass(
+      #    vis_tau1, vis_tau2, MET.X(), MET.Y())
+      
       #tree.vector_sum_pt = tree.vector_sum_pt_tau1_tau2_met      
       #branch37.Fill()
-      tree.resonance_pt = 1000*event.evtsel_higgs_vispt 
+      tree.resonance_pt = event.parent_pt 
       branch38.Fill()
-      tree.true_resonance_pt = 1000*event.evtsel_higgs_pt
+      tree.true_resonance_pt = 0
       branch39.Fill()
             
       if event.numJets >= 2:
@@ -446,6 +400,8 @@ def add_new_branches(tree):
          tree.dEta_jets = -999.
          branch40.Fill()
 
+      tree.dEta_jet1_jet2 = event.dEta_jets
+      branch400.Fill()
       if event.numJets >= 2:
          tree.eta_product_jets = jet1.Eta() * jet2.Eta()
          branch41.Fill()
@@ -461,13 +417,7 @@ def add_new_branches(tree):
          branch42.Fill()
 
 
-      ## JETs/TAUs Kinematic
-
-      # jet1 = ROOT.TLorentzVector()
-      # jet1.SetPtEtaPhiE(event.jet1_pt, event.jet1_eta, event.jet1_phi, event.jet1_e)        
-      # jet2 = ROOT.TLorentzVector()
-      # jet2.SetPtEtaPhiE(event.jet2_pt, event.jet2_eta, event.jet2_phi, event.jet2_e)
-      
+      ## JetTaus block
 
       # if event.mass_vis_tau1_tau2 != 0:
       #    tree.mass_ratio_jets_taus = event.mass_jet1_jet2 /event.mass_vis_tau1_tau2
@@ -555,7 +505,7 @@ class Job(Process):
         log.info("copying {0} to {1} ...".format(filename, output))
         shutil.copy(filename, output)
         with root_open(output, 'UPDATE') as file:
-            tree = file.Tree
+            tree = file.NOMINAL
             #if 'dPhi_tau1_tau2_MET' in tree:
              #      log.info("dphi_taus_met already exists in {0} ...".format(output))
               #     return
