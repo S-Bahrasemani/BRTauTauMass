@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+from math import pi
+import ROOT
+
+#### Create cut-flow histogram:
+cuts_list_pre = ["All","#tau1_pt" ,"#tau2_pt", "MET", "#Delta R_{#tau#tau}","#Delta #eta_{#tau#tau}", "#Delta#phi_{min}" ]
+cuts_list_vbf = cuts_list_pre[:]
+cuts_list_vbf.append("2J_50_30")
+cuts_list_vbf.append("#Delta#eta_{jj}")
+
+cuts_list_boosted = cuts_list_pre[:]
+cuts_list_boosted.append("!VBF")
+cuts_list_boosted.append ("H_{pt}")
+
+def draw_cut_flow(infile = "input file", cuts_list = "cuts list"):
+    cut_hist = ROOT.TH1F("H125 Boosted cut-flow", "H125 boosted cut-flow", len(cuts_list), 1 , len(cuts_list)+1)
+    for i, cut in zip(range(len(cuts_list)), cuts_list):
+        cut_hist.GetXaxis().SetBinLabel(i+1, cut)
+
+    ifile = ROOT.TFile(infile, "read")
+    tree = ifile.Get("NOMINAL")
+    for event in tree:
+        cut_hist.Fill(1)
+        if event.ditau_tau0_pt > 35 :
+            cut_hist.Fill(2)
+            if tree.ditau_tau1_pt > 25:
+                cut_hist.Fill(3)
+                # if ((event.ditau_tau0_jet_bdt_medium==1 and event.ditau_tau1_jet_bdt_tight ==1 ) or 
+                #     (event.ditau_tau1_jet_bdt_medium==1 and event.ditau_tau0_jet_bdt_tight ==1 )):
+                #     cut_hist.Fill(4)
+                if tree.met_et > 20:
+                    cut_hist.Fill(4)
+                    if tree.ditau_dr < 2.4 and tree.ditau_dr > 0.8:
+                        cut_hist.Fill(5)
+                        if event.ditau_deta < 1.5 :
+                            cut_hist.Fill(6)
+                            if event.ditau_met_min_dphi < pi/4:
+                                cut_hist.Fill(7)
+                                # if (event.jet_0_pt > 50 and event.jet_1_pt > 30):
+                                #     cut_hist.Fill(9)
+                                #     if (abs(event.jet_0_eta - event.jet_1_eta) > 2.):
+                                #         cut_hist.Fill(10)
+                                if not ((event.jet_0_pt > 50 and event.jet_1_pt > 30) and abs(event.jet_0_eta - event.jet_1_eta > 2.)):
+                                    cut_hist.Fill(8)
+                                    if event.parent_pt > 100:
+                                        cut_hist.Fill(9)
+                                        
+    ifile.Close()
+    c= ROOT.TCanvas()
+    c.Divide(2,1)
+    c.cd(2)
+    cut_exp = ROOT.TLatex()
+    cut_exp.SetTextAlign(12)
+    cut_exp.SetTextColor(4)
+    #cut_exp.SetTextSize(12)
+    cut_exp.DrawLatex(0.1,0.8, "#tau1_{pt} > 35")
+    cut_exp.DrawLatex(0.1,0.7, "#tau2_{pt} > 25")
+    cut_exp.DrawLatex(0.1,0.6, "#slash{ET} > 20")
+    cut_exp.DrawLatex(0.1, 0.5, "0.8 < #Delta R_{#tau#tau} < 2.4")
+    cut_exp.DrawLatex(0.1,0.4, "#Delta #eta_{#tau#tau} < 1.5")
+    cut_exp.DrawLatex(0.1, 0.3, "#Delta #phi_{m}(#tau#tau, MET) < #frac{#pi}{4}")
+    cut_exp.SetTextColor(1)
+    cut_exp.DrawLatex(0.1, 0.2, "VBF: J1_{pt} >50, J2_{pt} >30, #Delta #eta_{jj} > 2")
+    cut_exp.DrawLatex(0.1, 0.1,"Boosted: !VBF ; H_{pt} > 100")
+ 
+    cut_hist.SetLineColor(2)
+    cut_hist.SetFillStyle(3001)
+    cut_hist.SetFillColor(4)
+    cut_hist.SetStats(0)
+    c.cd(1)
+    cut_hist.Draw()
+    c.SaveAs("./plots/cut_flow_h125_boosted.eps")
+    return
+
+draw_cut_flow(infile= "/home/sbahrase/WorkDesk/BRT/BRTauTauMass/BRTauTauMass/ntuples/TestingBRT/HH/reco_gg_125_test_v0.root", cuts_list = cuts_list_boosted)
+

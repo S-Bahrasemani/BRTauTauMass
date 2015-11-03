@@ -2,7 +2,7 @@
 import os 
 import logging
 import math
-import datetime
+
 import shutil
  
 # rootpy/ROOT imports
@@ -20,73 +20,36 @@ from brtautau.samples import Higgs
 from brtautau.samples.higgs import * 
 from brtautau.categories.mva import *
 from brtautau.plotting.reco_ploter import *
+from brtautau.categories.common import H_Pt
+
 # setup the logging
-
-log = logging.getLogger(os.path.basename(__file__))
-
-my_datetime = datetime.date.today()
-my_datetime = my_datetime.strftime("%m%d%Y")
-
-# setup the argument parser
-parser = ArgumentParser()
-parser.add_argument('--mode', type=str, default='VBF', choices=['VBF', 'gg', 'mix'])
-parser.add_argument('--level', type = str , default = 'truth', choices = ['truth', 'reco'])
-parser.add_argument('--channel', type = str , default = 'hadhad', choices = ['hadhad','lephad', 'leplep'])
-parser.add_argument('--TrainMode', type=str, default='VBF', choices=['VBF', 'gg', 'mix'])
-args = parser.parse_args()
-
-
+#log = logging.getLogger(os.path.basename(__file__))
+ 
 set_style('ATLAS', shape='rect')
-# iterate over the masses and plot the lineshape
 
+# iterate over the masses and plot the lineshape
 #####################  SETTINGS  ####################
 
-if args.level == 'truth' and args.channel =='lephad':
-    if args.TrainMode == 'VBF':
-        NtuplesPath_H = NTUPLE_PATH + '/TRUTH-H/with_LH_VBF_train'
+test_ntuples_path = NTUPLE_PATH + "/TestingBRT/HH/TID-"+args.train_id+"_" + str(args.train_level)+"_" + str(args.train_mode)+ "_tr/"
 
-if args.level == 'truth' and args.channel =='lephad':
-    if args.TrainMode == 'gg':
-        NtuplesPath_H = NTUPLE_PATH + '/TRUTH-H/with_LH_gg_train'
-
-
-
-if args.level == 'reco' and args.channel =='hadhad':
-    if args.TrainMode == 'gg':
-        NtuplesPath_H = NTUPLE_PATH + "/HADHAD/H/weighted_gg_train"
-        NtuplesPath_Z = NTUPLE_PATH + "/HADHAD/Z/weighted_gg_train"
-    elif  args.TrainMode == 'VBF':
-        NtuplesPath_H = NTUPLE_PATH + "/HADHAD/H/weighted_VBF_train"
-        NtuplesPath_Z = NTUPLE_PATH + "/HADHAD/Z/weighted_VBF_train"
-
-if args.level == 'reco' and args.channel =='lephad':
-    if  args.TrainMode == 'gg':
-        NtuplesPath_H = NTUPLE_PATH + "/LEPHAD/H/weighted_gg_train"
-        NtuplesPath_Z = NTUPLE_PATH + "/LEPHAD/Z/weighted_gg_train"
-    elif  args.TrainMode == 'VBF':
-        NtuplesPath_H = NTUPLE_PATH + "/LEPHAD/H/weighted_VBF_train"
-        NtuplesPath_Z = NTUPLE_PATH + "/LEPHAD/Z/weighted_VBF_train"
-
-
-
-cuts = Cut('lephad==1')
-
-if args.channel == 'lephad' and args.level == 'reco' and args.mode =='VBF':
+#cuts = Cut('hh==1') & Cut("resonance_pt > 100000")
+cuts_pre = Category_Preselection.common_cuts
+if args.channel == 'lephad' and args.test_level == 'reco' and args.test_mode =='VBF':
     cuts = Category_VBF.cuts_lh
-if args.channel == 'lephad' and args.level =='reco' and args.mode =='gg':
+if args.channel == 'lephad' and args.test_level =='reco' and args.test_mode =='gg':
     cuts = Category_Boosted.cuts_lh
 
 
-if args.channel == 'hadhad' and args.level == 'reco' and args.mode =='VBF':
-    cuts = Category_VBF.cuts
-if args.channel == 'hadhad' and args.level =='reco' and args.mode =='gg':
-    cuts = Category_Boosted.cuts
-  
+if args.channel == 'hh' and args.test_level == 'reco' and args.test_mode =='VBF':
+    cuts_vbf = Category_VBF.cuts #& cuts_pre
+if args.channel == 'hh' and args.test_level =='reco' and args.test_mode =='gg':
+    cuts_gg = Category_Boosted.cuts #& cuts_pre
 
-if args.level == 'truth':
-    Masses = Higgs.MASSES
 
-elif args.level =='reco':
+if args.test_level == 'truth':
+    Masses = Higgs.MASSES 
+ 
+elif args.test_level =='reco':
     Masses = range(100, 155, 5)
 
 
@@ -95,234 +58,130 @@ Estimators_Hists_Mean={}
 Estimators_Hists_MeanError={}
 Estimators_Hists_RMS={}
 Estimators_Hists_RMSError={}
-
+ 
 brt_means=[]
 brt_mean_errors=[]
 brt_rms=[]
 brt_rms_error=[]
 
 
+#cuts=cuts_pre
+
+
+cuts = Cut("ditau_tau1_matched_isHadTau==1") & Cut("ditau_tau0_matched_isHadTau==1") & cuts_vbf
 for mass in Masses:
     # instantiate a Higgs sample at a given mass
-    higgs = Higgs(ntuple_path = NtuplesPath_H ,tree_name ='Tree', mass=mass,level = args.level,  mode=args.mode)
-
+    higgs = Higgs(ntuple_path = test_ntuples_path, tree_name ='Tree', mass=mass,level = args.test_level,  mode=args.test_mode, suffix='_test')
     # Declare and fill the hist dict for the BRT, MMC, Coll mass
-    brt_hist = {'0.001*brt_mass': Hist(30, 0, 250)}
+    brt_hist = {'brt_mass': Hist(30, 0, 250)}
     brt_hist = higgs.get_hist_array(brt_hist, cuts = cuts)
 
     # Declare the BRT mass histogram                                                 
-    hist_BRT = brt_hist['0.001*brt_mass']
+    hist_BRT = brt_hist['brt_mass']
     hist_BRT.xaxis.title = 'BRT Mass [GeV]'
     # plot the lineshape
     c = Canvas()
+    hist_BRT.SetFillStyle("/")
+    hist_BRT.SetFillColor("green")
+    hist_BRT.SetLineColor("blue")
     hist_BRT.Draw('HIST')
+    
+
+    leg = ROOT.TLegend(0.8, 0.7, 0.95, 0.9)
+    leg.AddEntry(hist_BRT,"#events = %i" %hist_BRT.Integral(),"l")
+    leg.AddEntry(hist_BRT,"Mean = {:.2f}".format(hist_BRT.GetMean()),"l")
+    leg.AddEntry(hist_BRT,"RMS = {:.2f}".format(hist_BRT.GetRMS()),"l")
+    leg.Draw()
+
     lat = ROOT.TLatex(
         c.GetLeftMargin() + 0.05,
         1 - c.GetTopMargin() - 0.05,
-        '{0}-{1}H#rightarrow#tau#tau @ {2} GeV -- {3}'.format(args.level, args.mode, mass, args.channel))
+       'H#rightarrow#tau_{%s}#tau_{%s} @ %i GeV --#color[2]{TrainMode: %s} / #color[4]{TestMode:%s}'
+       % (args.channel[0], args.channel[1],mass, args.train_mode, args.test_mode))
     lat.SetNDC(True)
     lat.SetTextSize(22)
     lat.Draw()
-    c.SaveAs('./plots/' + str(args.channel)+ '/'+str(my_datetime)+'-lineshape_{0}_{1}_{2}.png'.format(args.level, args.mode, mass))
-
-    #log.info('-- m(H) = %s: m(BRT) = %s, res = %s' % (mass, hist_BRT.GetMean(), hist_BRT.GetRMS()))
+    c.SaveAs('./plots/' + str(args.channel)+'/'+str(args.test_level)+'/'
+             +str(args.train_id)+'-lineshape_{0}_{1}_{2}_{3}_{4}.png'.format(mass,args.test_level, args.test_mode, args.channel, H_Pt))
 
     brt_means.append(hist_BRT.GetMean())
     brt_mean_errors.append(hist_BRT.GetMeanError())
     brt_rms.append(hist_BRT.GetRMS())
     brt_rms_error.append(hist_BRT.GetRMSError())
     
-    if args.level == 'reco':
-
-        brt_hist = {'0.001*brt_mass': Hist(30, 0, 250)} ## careful scales are different for hadhad and lephad
+    if args.test_level == 'reco':
+        brt_hist = {'brt_mass': Hist(30, 0, 250)} 
         brt_hist = higgs.get_hist_array(brt_hist, cuts=cuts)
-        hist_BRT=brt_hist['0.001*brt_mass']
+        hist_BRT=brt_hist['brt_mass']
 
-        
-        mmc_hist = {'0.001*mmc1_resonance_m': Hist(30, 0, 250)} ## careful scales are different for hadhad and lephad
+        mmc_hist = {'ditau_mmc_mlnu3p_m': Hist(30, 0, 250)} 
         mmc_hist = higgs.get_hist_array(mmc_hist, cuts=cuts)
-        hist_MMC=mmc_hist['0.001*mmc1_resonance_m']
+        hist_MMC=mmc_hist['ditau_mmc_mlnu3p_m']
 
-        coll_hist = {'0.001*mass_collinear_tau1_tau2': Hist(30, 0, 250)}
-        coll_hist = higgs.get_hist_array(coll_hist, cuts=cuts)
-        hist_Coll = coll_hist['0.001*mass_collinear_tau1_tau2']
+        mosaic_hist = {'ditau_mosaic_mH': Hist(30, 0, 250)}
+        mosaic_hist = higgs.get_hist_array(mosaic_hist, cuts=cuts)
+        hist_Mosaic = mosaic_hist['ditau_mosaic_mH']
         #log.info('--m(H) = %s: m(MMC) = %s , res = %s' % (mass, hist_MMC.GetMean(), hist_MMC.GetRMS()))
-        Estimators_Hists[mass]= [hist_BRT, hist_MMC, hist_Coll]
+        Estimators_Hists[mass]= [hist_BRT, hist_MMC, hist_Mosaic]
 
-        Estimators_Hists_Mean[mass]= [hist_BRT.GetMean(), hist_MMC.GetMean(), hist_Coll.GetMean()]
-        Estimators_Hists_MeanError[mass]= [hist_BRT.GetMeanError(), hist_MMC.GetMeanError(), hist_Coll.GetMeanError()]
+        Estimators_Hists_Mean[mass]= [hist_BRT.GetMean(), hist_MMC.GetMean(), hist_Mosaic.GetMean()]
+        Estimators_Hists_MeanError[mass]= [hist_BRT.GetMeanError(), hist_MMC.GetMeanError(), hist_Mosaic.GetMeanError()]
         
-        Estimators_Hists_RMS[mass]= [hist_BRT.GetRMS(), hist_MMC.GetRMS(), hist_Coll.GetRMS()]
-        Estimators_Hists_RMSError[mass]= [hist_BRT.GetRMSError(), hist_MMC.GetRMSError(), hist_Coll.GetRMSError()]
+        Estimators_Hists_RMS[mass]= [hist_BRT.GetRMS(), hist_MMC.GetRMS(), hist_Mosaic.GetRMS()]
+        Estimators_Hists_RMSError[mass]= [hist_BRT.GetRMSError(), hist_MMC.GetRMSError(), hist_Mosaic.GetRMSError()]
         
-
-
 
 ############# RECO PLOTS BLOCK #############
 
+# ## Build the reco curves for mass estimators comparison:
 
-## Build the reco curves for mass estimators comparison:
-
-if args.level== 'reco':
-    reco_plotter(Estimators_Hists,Estimators_Hists_Mean, Estimators_Hists_MeanError, Estimators_Hists_RMS,
-                 Estimators_Hists_RMSError, masses=Masses, date=my_datetime, level=args.level, mode=args.mode, channel= args.channel)
+draw_calib_curve(Estimators_Hists,Estimators_Hists_Mean, Estimators_Hists_MeanError, Estimators_Hists_RMS, 
+                 Estimators_Hists_RMSError, masses=Masses, date=my_datetime, level=args.test_level,
+                 mode=args.test_mode, channel= args.channel, train_id = args.train_id)
     
+#### CREATING ROC CURVES: H(acceptance)- Z(rejection)
 
-    #### CREATING ROC CURVES: H(acceptance)- Z(rejection)
+Zboson = Higgs(ntuple_path = test_ntuples_path, tree_name ='Tree', mode = 'Z', mass = 90, level = 'reco', suffix = '_test')
 
-    ## Dumy Z masses only for consistency with Higgs class (will be changed)
+brt_hist = {'brt_mass': Hist(30, 0, 250)} 
+brt_hist = Zboson.get_hist_array(brt_hist, cuts=cuts)
+hist_BRT=brt_hist['brt_mass']
 
-    ZMasses = [80, 85, 90, 95, 100]
-    Z_hists_temp = []
-    for mass in ZMasses:
-        Zboson = Higgs(ntuple_path = NtuplesPath_Z, tree_name ='Tree', mode = 'Z', mass = mass, level = 'reco')
-        # Declare and fill the hist dict for the BRT, MMC, Coll mass
-        brt_hist = {'0.001*brt_mass': Hist(30, 0, 250)}
-        brt_hist = Zboson.get_hist_array(brt_hist, cuts = cuts)
-        # Declare the BRT mass histogram                                                 
-        hist_BRT = brt_hist['0.001*brt_mass']
 
-        mmc_hist = {'0.001*mmc1_resonance_m': Hist(30, 0, 250)}
-        mmc_hist = Zboson.get_hist_array(mmc_hist, cuts=cuts)
-        hist_MMC=mmc_hist['0.001*mmc1_resonance_m']
+mmc_hist = {'ditau_mmc_mlnu3p_m': Hist(30, 0, 250)} 
+mmc_hist = Zboson.get_hist_array(mmc_hist, cuts=cuts)
+hist_MMC=mmc_hist['ditau_mmc_mlnu3p_m']
 
-        coll_hist = {'0.001*mass_collinear_tau1_tau2': Hist(30, 0, 250)}
-        coll_hist = Zboson.get_hist_array(coll_hist, cuts=cuts)
-        hist_Coll = coll_hist['0.001*mass_collinear_tau1_tau2']
+mosaic_hist = {'ditau_mosaic_mH': Hist(30, 0, 250)}
+mosaic_hist = Zboson.get_hist_array(mosaic_hist, cuts=cuts)
+hist_Mosaic = mosaic_hist['ditau_mosaic_mH']
       
-        Z_hists_temp.append([hist_BRT, hist_MMC,hist_Coll])    
-    for i in range(1,5):
-        for j in range(3):
-            Z_hists_temp[0][j].Add(Z_hists_temp[i][j])
+Z_hists_temp=[hist_BRT, hist_MMC,hist_Mosaic]    
     
-    Z_hists_Nor = [Z_hists_temp[0][0].Clone("hist_BRT"), Z_hists_temp[0][1].Clone("hist_MMC"), Z_hists_temp[0][2].Clone("hist_Coll")]
-    [Z_hists_Nor[i].Scale(1./Z_hists_Nor[i].Integral()) for i in range(3)]
-    Z_hists = Z_hists_Nor
-        
-    H125_hists_temp = Estimators_Hists[125]
-    H125_hists = [H125_hists_temp[0].Clone("hist_BRT"), H125_hists_temp[1].Clone("hist_MMC"), H125_hists_temp[2].Clone("hist_Coll")]
-    [H125_hists[i].Scale(1./H125_hists[i].Integral()) for i in range(3)]
-    
+Z_hists_Nor = [Z_hists_temp[0].Clone("hist_BRT"), Z_hists_temp[1].Clone("hist_MMC"), Z_hists_temp[2].Clone("hist_Mosaic")]
+[Z_hists_Nor[i].Scale(1./Z_hists_Nor[i].Integral()) for i in range(3)]
+Z_hists = Z_hists_Nor
+
+H125_hists_temp = Estimators_Hists[125]
+H125_hists = [H125_hists_temp[0].Clone("hist_BRT"), H125_hists_temp[1].Clone("hist_MMC"), H125_hists_temp[2].Clone("hist_Mosaic")]
+[H125_hists[i].Scale(1./H125_hists[i].Integral()) for i in range(3)]
+
 ### Higgs Normalized Hists
-    Estimators_Hists_Nor = {}
-    for mass in Masses:
-        hist_temp = Estimators_Hists[mass]
-        hist = [hist_temp[0].Clone("hist_BRT"), hist_temp[1].Clone("hist_MMC"), hist_temp[2].Clone("hist_Coll")]
-        [hist[i].Scale(1./hist[i].Integral()) for i in range(3)]
-    
-        Estimators_Hists_Nor [mass]= hist
+Estimators_Hists_Nor = {}
+for mass in Masses:
+    hist_temp = Estimators_Hists[mass]
+    hist = [hist_temp[0].Clone("hist_BRT"), hist_temp[1].Clone("hist_MMC"), hist_temp[2].Clone("hist_Mosaic")]
+    [hist[i].Scale(1./hist[i].Integral()) for i in range(3)]
+    Estimators_Hists_Nor [mass]= hist
 
-
-    roc_plotter(H_Hists = Estimators_Hists_Nor, Z_Hist = Z_hists , channel = args.channel, mode = args.mode, date =my_datetime)
+draw_mass_lineshapes(H_Hists = Estimators_Hists_Nor, Z_Hist = Z_hists , channel = args.channel, mode = args.test_mode, train_id = args.train_id, H_Pt = H_Pt)
+draw_roc_curve(H1 = H125_hists, H2 = Z_hists, H1_tag = 'Z', H1_mass = '90', H2_tag= 'H', H2_mass = '125', channel = args.channel,
+               mode = args.test_mode, train_id = args.train_id, H_Pt = H_Pt)
  
-# Build the BRT-calibration curve
-gr_calib = Graph(len(brt_means))
-for i, (true, brt) in enumerate(zip(Higgs.MASSES, brt_means)):
-    gr_calib.SetPoint(i, true, brt)
-gr_calib.xaxis.title = 'True Higgs Mass [GeV]'
-gr_calib.yaxis.title = 'Mean of BRT Mass [GeV]'
-
-# Draw the BRT-calibration curve
-c = Canvas()
-gr_calib.Draw('AP')
-
-
-lat = ROOT.TLatex(
-    c.GetLeftMargin() + 0.05,
-    1 - c.GetTopMargin() - 0.05,
-    '{0}-{1}#rightarrowH#rightarrow#tau#tau'.format(args.level,args.mode))
-lat.SetNDC(True)
-lat.SetTextSize(22)
-lat.Draw()
-c.SaveAs('plots/'+ str(args.channel)+'/'+str(my_datetime)+'Calibration_{0}_{1}.png'.format(args.level, args.mode))
-
-
-# Build the Linear fit curve
-gr_calib = Graph(len(brt_means))
-for i, (true, brt) in enumerate(zip(Higgs.MASSES, brt_means)):
-    gr_calib.SetPoint(i, true, brt)
-gr_calib.xaxis.title = 'True Higgs Mass [GeV]'
-gr_calib.yaxis.title = 'Mean of BRT Mass [GeV]'
-
-fitmin = Higgs.MASSES[0] + 20
-fitmax = Higgs.MASSES[-1] -20
-flin2 = ROOT.TF1('flin2','[0]+[1]*x',fitmin-0.1,fitmax+0.1)
-flin2.SetLineColor(4)
-gr_calib.Fit(flin2,'RS','',fitmin-0.1,fitmax+0.1)
-intercept2 = flin2.GetParameter(0)
-slope2     = flin2.GetParameter(1)
-
-c = Canvas()
-gr_calib.Draw('AP')
-
-lat = ROOT.TLatex(
-    c.GetLeftMargin() + 0.05,
-    1 - c.GetTopMargin() - 0.05,
-    '{0}-{1}#rightarrowH#rightarrow#tau#tau'.format(args.level,args.mode))
-lat.SetNDC(True)
-lat.SetTextSize(22)
-lat.Draw()
-lat = ROOT.TLatex(
-    c.GetLeftMargin() + 0.28,
-    c.GetBottomMargin() + 0.14,
-    'm_brt = %0.3f#times m_{true} + %0.1f'%(slope2,intercept2))
-lat.SetNDC(True)
-lat.SetTextSize(22)
-lat.Draw()
-c.SaveAs('plots/'+ str(args.channel)+'/'+str(my_datetime)+'-linear_fit_{0}_{1}.png'.format(args.level, args.mode))
-
-## Resolution plots 
-
-res_hists_names=['rms_mass_BRT_vs_mass_true', 'res_mass_BRT_vs_mass_true'] 
-res_hists = {}
-for i in res_hists_names:
-    res_hists[i]=ROOT.TGraphErrors()
-    res_hists[i].SetName('rms_mass_BRT_vs_mass_true')
-    res_hists[i].SetMarkerSize(0.8)
-    res_hists[i].SetMarkerColor(2)
-    res_hists[i].SetLineColor(2)
-
-res_hists['rms_mass_BRT_vs_mass_true'].SetMinimum(0)
-res_hists['rms_mass_BRT_vs_mass_true'].SetMaximum(50)
-res_hists['res_mass_BRT_vs_mass_true'].SetMinimum(0)
-res_hists['res_mass_BRT_vs_mass_true'].SetMaximum(0.7)
-
-for p, mass, mean, mean_error, rms, rms_error in zip(range(len(Higgs.MASSES)), Higgs.MASSES, brt_means, brt_mean_errors, brt_rms, brt_rms_error ):
-    res_hists['rms_mass_BRT_vs_mass_true'].SetPoint(p,mass,rms)
-    res_hists['rms_mass_BRT_vs_mass_true'].SetPointError(p,0,rms_error)
-    res_hists['res_mass_BRT_vs_mass_true'].SetPoint(p,mass,rms/mass)
-    res_hists['res_mass_BRT_vs_mass_true'].SetPointError(p,0,math.sqrt(pow(rms_error/mean,2)+pow(rms/(mean*mean)*mean_error,2)))
-
-# Draw the resolution plots
-c = Canvas()
-
-res_hists['rms_mass_BRT_vs_mass_true'].Draw('AP')
-res_hists['rms_mass_BRT_vs_mass_true'].GetXaxis().SetTitle('m_{true} [GeV]')
-res_hists['rms_mass_BRT_vs_mass_true'].GetYaxis().SetTitle('RMS-m_{brt}  [GeV]')
-
-lat = ROOT.TLatex(
-    c.GetLeftMargin() + 0.05,
-    1 - c.GetTopMargin() - 0.15,
-    '{0}-{1}#rightarrowH#rightarrow#tau#tau'.format(args.level, args.mode))
-
-lat.SetNDC(True)
-lat.SetTextSize(32)
-lat.Draw()
-c.SaveAs('plots/'+ str(args.channel)+'/'+str(my_datetime)+'-rms_mass_BRT_vs_mass_true_{0}_{1}.png'.format(args.level, args.mode))
-
-res_hists['res_mass_BRT_vs_mass_true'].Draw('AP')
-res_hists['res_mass_BRT_vs_mass_true'].GetXaxis().SetTitle('m_{true} [GeV]')
-res_hists['res_mass_BRT_vs_mass_true'].GetYaxis().SetTitle('res-m_{brt} ')
-
-lat = ROOT.TLatex(
-    c.GetLeftMargin() + 0.05,
-    1 - c.GetTopMargin() - 0.15,
-    '{0}-{1}#rightarrowH#rightarrow#tau#tau'.format(args.level, args.mode))
-
-lat.SetNDC(True)
-lat.SetTextSize(32)
-lat.Draw()
-c.SaveAs('plots/'+ str(args.channel)+'/'+str(my_datetime)+'-res_mass_BRT_vs_mass_true_{0}_{1}.png'.format(args.level, args.mode))
-c.Clear()
-
+# ### Draw Higgs Roc Curves:
+# for mass1 in range(100, 155, 5):
+#     for mass2 in range (mass1 + 5, 155, 5):
+#         H2 = Estimators_Hists_Nor[mass1]
+#         H1 = Estimators_Hists_Nor[mass2]
+#         draw_roc_curve(H1 = H1, H2= H2, H1_tag= 'H', H1_mass = str(mass1) ,H2_tag= 'H', H2_mass = str(mass2),  channel =args.channel, mode =args.test_mode,train_id = args.train_id)
 

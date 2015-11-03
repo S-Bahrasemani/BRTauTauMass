@@ -1,0 +1,65 @@
+#! /usr/bin/env python
+
+
+import os
+import shutil
+from multiprocessing import Process
+import logging
+import ROOT
+from ROOT import TTree, TFile
+
+class Slim (Process):
+    def __init__(self, filename):
+        super(Skim, self).__init__()
+        self.filename = filename
+    
+    def run(self):
+        fname = self.filename
+        path , name = os.path.split(fname)
+        print path, name
+        oname = os.path.join(path, "hh." + name)
+        print oname
+        if os.path.exists(oname):
+            logging.error("file {} is alreadey there".format(oname))
+#            raise Exception(" file already exists in the directory")
+
+        logging.info("copying {0} to {1} ...".format(fname, oname))
+        
+        ifile = TFile(fname, "update")
+        itree = ifile.Get("NOMINAL")
+        ofile = TFile(oname, "create")        
+        
+        #--- Throw away some branches
+        itree.SetBranchStatus("tau_*",    0)
+        itree.SetBranchStatus("ditau*",    0)
+        itree.SetBranchStatus("HLT*",    0)
+        itree.SetBranchStatus("selection*",    0)
+        
+        otree = itree.CloneTree(0)
+        entries = itree.GetEntries()
+       
+        for i in xrange(entries):
+            itree.GetEvent(i)  
+            if not (itree.true_tau_1_isHadTau==1 and itree.true_tau_0_isHadTau ==1):
+                continue
+
+            otree.Fill()
+            
+        ofile.cd()
+        otree.Write()
+        ofile.Close()
+        ifile.Close()
+
+
+
+        
+if __name__ == '__main__':
+    from rootpy.extern.argparse import ArgumentParser
+
+    parser = ArgumentParser()
+    parser.add_argument('files', nargs='+')
+    args = parser.parse_args()
+
+    from brtautau.parallel import run_pool
+    jobs = [Slim(f) for f in args.files]
+    run_pool(jobs, n_jobs=-1)

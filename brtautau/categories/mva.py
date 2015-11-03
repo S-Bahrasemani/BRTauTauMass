@@ -6,7 +6,7 @@ from .common import (
     Category_Preselection_DEta_Control,
     CUTS_VBF,CUTS_VBF_LH,  CUTS_VBF_CR,
     CUTS_BOOSTED, CUTS_BOOSTED_CR,
-    DETA_TAUS)
+    DETA_TAUS, H_Pt)
 from .truth import CUTS_TRUE_VBF, CUTS_TRUE_BOOSTED
 from .features import features_vbf, features_boosted
 
@@ -38,8 +38,9 @@ class Category_VBF(Category_Preselection):
     jk_number = 6
     common_cuts = Category_Preselection.common_cuts
     cuts = (
+        #common_cuts
         CUTS_VBF
-        & Cut('dEta_jets > 2.0')
+        #& Cut('dEta_jets > 2.0')
         )
     
     cuts_lh= (
@@ -79,7 +80,7 @@ class Category_Boosted_DEta_Control(Category_Preselection):
 
 class Category_Boosted(Category_Preselection):
     name = 'boosted'
-    label = '#tau_{had}#tau_{had} Boosted'
+    label = '#tau_{h}#tau_{h} Boosted, pt > %i' %H_Pt
     latex = '\\textbf{Boosted}'
     color = 'blue'
     linestyle = 'dashed'
@@ -88,9 +89,10 @@ class Category_Boosted(Category_Preselection):
     cuts = (
         (- Category_VBF.cuts)
         & CUTS_BOOSTED
+        #& common_cuts
         #& Cut(MET_CENTRALITY.format(pi / 6))
         )
-
+    
     cuts_lh = (- Category_VBF.cuts
         & Category_Preselection_LH.common_cuts
         )

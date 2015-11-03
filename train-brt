@@ -3,23 +3,14 @@ import os
 import datetime
 import logging
 
-log = logging.getLogger(os.path.basename(__file__))
+#log = logging.getLogger(os.path.basename(__file__))
 from ROOT import TMVA
 from brtautau.regressor import Regressor
 from brtautau.categories.features import FEATURES 
-
-from rootpy.extern.argparse import ArgumentParser
-parser = ArgumentParser()
-parser.add_argument('--mode', default='gg', type=str, choices=['VBF', 'gg'])
-parser.add_argument('--dry', action='store_true', default=True)
-parser.add_argument('--level', default='truth', type=str, choices=['truth', 'reco'])
-
-args = parser.parse_args()
-
-channels=['hadhad', 'lephad', 'leplep']
+from brtautau import *
 
 ## Set the directory where to save the weights file.
-(TMVA.gConfig().GetIONames()).fWeightFileDir = './RESULTS/'
+(TMVA.gConfig().GetIONames()).fWeightFileDir = './RESULTS'
 
 log.info("Training begins !")
 
@@ -27,7 +18,10 @@ my_datetime = datetime.date.today()
 my_datetime = my_datetime.strftime("%m%d%Y")
 features = FEATURES
 brt_regressor = Regressor(
-    './RESULTS/'+ str(my_datetime)+'-'+str(args.level)+'_' + str(args.mode)+'_' + channels[1] +'_training_output.root',
+    './RESULTS/'+ str(my_datetime)+'-'+str(args.train_level)+'_' + str(args.train_mode)+'_' + str(args.channel) +'_training_output.root',
     features)
+try:
+    brt_regressor.train(mode=args.train_mode, level=args.train_level)
 
-brt_regressor.train(mode=args.mode, level=args.level)
+except KeyboardInterrupt:
+    print "Gracefully terminated by the user"

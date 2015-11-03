@@ -9,6 +9,7 @@ from .templates import RatioPlot, SimplePlot
 from .. import ATLAS_LABEL
 
 VAR_PATTERN = re.compile('((?P<prefix>hlt|off|true)_)?(?P<var>[A-Za-z0-9_]+)(\*(?P<scale>\d+\.\d*))?$')
+
 def get_xtitle(field):
     if field in VARIABLES:
         return get_label(VARIABLES[field])
@@ -33,7 +34,7 @@ def get_ymax(hists):
 
 
 def draw_ratio(a, b, field, category,
-               textsize=22,
+               textsize=15,
                ratio_range=(0, 2),
                ratio_line_values=[0.5, 1, 1.5],
                optional_label_text=None,
@@ -66,7 +67,7 @@ def draw_ratio(a, b, field, category,
             b /= b_integral
     a.title = 'A: ' + a.title
     b.title = 'B: ' + b.title
-    a.color = 'black'
+    a.color = 'blue'
     b.color = 'red'
     a.legendstyle = 'L'
     b.legendstyle = 'L'
@@ -83,15 +84,16 @@ def draw_ratio(a, b, field, category,
     plot.draw('main', [a, b], ypadding=(0.3, 0.))
     ratio = Hist.divide(a, b, fill_value=-1)
     ratio.drawstyle = 'hist'
-    ratio.color = 'black'
+    ratio.color = 'green'
     ratio_band = Graph(ratio, fillstyle='/', fillcolor='black', linewidth=0)
     ratio_band.drawstyle = '20'
     plot.draw('ratio', [ratio_band, ratio])
     with plot.pad('main') as pad:
         # legend
-        #         leg = Legend([a, b], 0.2, 0.2, 0.45,
-        #                      margin=0.35, textsize=textsize)
-        leg = Legend([a, b])
+        # leg = Legend([a, b], 0.2, 0.2, 0.45,
+        #                      """margin=0.35""", textsize=textsize)
+       
+        leg = Legend([a, b], textsize=textsize)
         leg.Draw()
         # draw the category label
         if category is not None:

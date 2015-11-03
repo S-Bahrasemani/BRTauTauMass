@@ -19,3 +19,6 @@ weights_prod/*
 *.e*
 *.o*
 test.py
+RESULTS/
+zntuples/
+brtautau/flat

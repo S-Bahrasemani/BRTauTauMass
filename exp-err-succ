@@ -1,0 +1,26 @@
+#! /usr/bin/env python 
+
+
+#from brtautau.variables import VARIABLES
+#import rootpy
+
+#from rootpy.tree import TreeModel, FloatCol, IntCol, BoolCol, CharCol
+
+varss ={
+    'resonance_m': {
+        'name': 'resonance_m',
+        'root': 'm_{H}',
+        'type': 'f',
+        'units': 'GeV',
+        'scale': 1.,
+        'bins': 30,
+        'range': (50, 200)
+        },
+    }
+
+for k, v in varss.iteritems():
+    if v["type"]=='f':
+        exec("%s = %.2f" % (k, v["bins"]) )
+    
+print resonance_m*2
+

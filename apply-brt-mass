@@ -13,26 +13,28 @@ import ROOT
 import array
 
 from brtautau.categories.features import FEATURES
-
-log = logging.getLogger('apply-bdt-weights')
+from brtautau import *
+#log = logging.getLogger('apply-bdt-weights')
 
 
 brt_reader = ROOT.TMVA.Reader()
 brt_input_variables = {}
+
 
 for feat in FEATURES:
      
        brt_input_variables[feat] = array.array('f', [-1.])
        brt_reader.AddVariable(feat, brt_input_variables[feat])
        
-brt_reader.BookMVA("TMVARegression_BRT_HiggsMass-04112015_truth_gg_lephad", "./RESULTS/TMVARegression_BRT_HiggsMass-04112015_truth_gg_lephad.weights.xml")
+brt_reader.BookMVA("TMVARegression_BRT_HiggsMass-"+args.train_id+"_"+args.train_level+"_"+args.train_mode+"_"+args.channel+".weights.xml",
+                   "./RESULTS/TMVARegression_BRT_HiggsMass-"+args.train_id+"_"+args.train_level+"_"+args.train_mode+"_"+args.channel+".weights.xml")
 
 def evaluate_brt(tree, reader, feats):
        # log.debug('------------------')
        for f in feats.keys():
               feats[f][0] = getattr(tree, f)
        # log.debug(feats)
-       mass = reader.EvaluateMVA('TMVARegression_BRT_HiggsMass-04112015_truth_gg_lephad')
+       mass = reader.EvaluateMVA("TMVARegression_BRT_HiggsMass-"+args.train_id+"_"+args.train_level+"_"+args.train_mode+"_"+args.channel+".weights.xml")
        # log.debug('BRT MASS = %s' % mass)
        return mass
 
@@ -61,30 +63,28 @@ class Job(Process):
         filename = self.filename
         path, name = os.path.split(filename)
         # copy to new file
-        output = os.path.join(path, 'weighted.' + name)
+        
+        outdir =path + "/TID-"+args.train_id + "_" + args.train_level+ "_" + args.train_mode +"_tr/"
+        
+        # print outdir
+        # if os.path.exists(dir):
+        #        shutil.rmtree(dir)
+        # os.makedirs(dir)
+        output = os.path.join(path + "/TID-"+args.train_id +"_"+ args.train_level+ "_" + args.train_mode +"_tr", name[:-8] + ".root")
+    
         if os.path.exists(output):
-            return 
+               raise Exception (" {} already exist here" .format(output))
         log.info("copying {0} to {1} ...".format(filename, output))
         shutil.copy(filename, output)
         with root_open(output, 'UPDATE') as file:
-            tree = file.Tree
+            tree = file.NOMINAL
             if 'brt_mass' in tree:
-                   log.info("brt mass already exists in {0} ...".format(output))
-                   return
+                   raise Exception ("brt_mass branch already exists in {}". format(output))
             log.info("adding brt mass to {0} ...".format(output))
             add_brt_mass(tree)
             tree.Write(tree.name, ROOT.TObject.kOverwrite)
 
-
 if __name__ == '__main__':
-    from rootpy.extern.argparse import ArgumentParser
-
-    parser = ArgumentParser()
-    parser.add_argument('files', nargs='+')
-    args = parser.parse_args()
-
     from brtautau.parallel import run_pool
     jobs = [Job(f) for f in args.files]
     run_pool(jobs, n_jobs=-1)
-
-

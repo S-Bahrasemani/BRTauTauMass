@@ -1,0 +1,130 @@
+#!/usr/bin/env python
+
+## ROOT, rootpy imports
+import ROOT
+from rootpy.tree.filtering import EventFilter, EventFilterList
+from rootpy.tree import Tree, TreeChain, TreeModel, TreeBuffer
+from rootpy.extern.argparse import ArgumentParser
+from rootpy.io import root_open
+from rootpy import stl
+
+
+import os, shutil
+from brtautau import parallel
+import logging
+from multiprocessing import Process
+import array
+from brtautau.parallel import run_pool
+
+
+from brtautau.models import *
+
+parser = ArgumentParser()
+parser.add_argument('files', nargs='+')
+args = parser.parse_args()
+   
+def mc_weight_count(event):
+    return event.mc_event_weight
+count_funcs = {
+    'mc_weight': mc_weight_count,
+}
+
+
+
+class Job(Process):
+    def __init__(self, filename):
+        super(Job, self).__init__()
+        self.filename = filename
+
+    def run(self):
+        branches_to_REMOVE = []#'jet1*', 'jet2*']
+        filename = self.filename
+        path, name = os.path.split(filename)
+        outputname = os.path.join(path, 'v1.' + name)
+ 
+        #### copy to new files
+        if os.path.exists(outputname):
+            return
+        log.info("copying {0} to {1} ...".format(filename, outputname))
+        shutil.copy(filename, outputname)
+        
+       #### Initialize output tree:        
+        outfile = root_open(outputname, 'recreate')
+        outfile.cd()
+        model = get_model()
+        outtree = Tree(name='NOMINAL', model=model)
+        outtree.define_object(name='tau1', prefix='ditau_tau0_')
+        outtree.define_object(name='tau2', prefix='ditau_tau1_')
+        outtree.define_object(name='jet1', prefix='jet1_')
+        outtree.define_object(name='jet2', prefix='jet2_')
+        outtree.define_object(name='higgs', prefix='parent_')
+        outtree.define_object(name='met', prefix='met_')
+        log.info(model)
+    
+        with root_open(filename) as test_file:
+            test_tree = test_file.Get('NOMINAL')
+            ignore_branches = test_tree.glob(branches_to_REMOVE)
+            
+        chain = TreeChain(
+            "NOMINAL",
+            files=filename,
+         #   filters=event_filters,
+            cache=True,
+            cache_size=50000000,
+            learn_entries=100,
+            ignore_branches=ignore_branches)
+
+        for event in chain:
+
+            #### declare and fill 4momentums
+            true_tau1=ROOT.TLorentzVector()
+            true_tau1.SetPtEtaPhiM(event.true_tau_0_pt, event.true_tau_0_eta, event.true_tau_0_phi, event.true_tau_0_m)
+            true_tau2=ROOT.TLorentzVector()
+            true_tau2.SetPtEtaPhiM(event.true_tau_1_pt, event.true_tau_1_eta, event.true_tau_1_phi, event.true_tau_1_m)
+            
+            tau1=ROOT.TLorentzVector()
+            tau1.SetPtEtaPhiM(event.true_tau_0_pt_vis, event.true_tau_0_eta_vis, event.true_tau_0_phi_vis, event.true_tau_0_m_vis)
+            tau2=ROOT.TLorentzVector()
+            tau2.SetPtEtaPhiM(event.true_tau_1_pt_vis, event.true_tau_1_eta_vis, event.true_tau_1_phi_vis, event.true_tau_1_m_vis)
+            
+            miss1 = true_tau1 - tau1
+            miss2 = true_tau2 - tau2
+            MET= miss1 + miss2
+
+            jet1= ROOT.TLorentzVector()
+            jet1.SetPtEtaPhiM(event.jet_0_pt, event.jet_0_eta, event.jet_0_phi, event.jet_0_m)
+            jet2= ROOT.TLorentzVector()
+            jet2.SetPtEtaPhiM(event.jet_1_pt, event.jet_1_eta, event.jet_1_phi, event.jet_1_m)
+
+            resonance = ROOT.TLorentzVector()
+            resonance.SetPtEtaPhiM(event.parent_pt, event.parent_eta, event.parent_phi, event.parent_m)
+
+
+            #### event block
+            outtree.runnumber = event.run_number
+            outtree.evtnumber = event.event_number
+            #outtree.weight = event.mc_event_weight
+            
+            #### fill particles 4momentum
+            FourMomentum.set(outtree.tau1, tau1)
+            FourMomentum.set(outtree.tau2, tau2)
+            #TrueMet.set(outtree.met, MET)
+            FourMomentum.set(outtree.jet1, jet1)
+            FourMomentum.set(outtree.jet2, jet2)
+            FourMomentum.set(outtree.higgs, resonance)
+            TrueTauBlock.set(outtree, event,MET, tau1, tau2, jet1, jet2)
+            #TrueJetBlock.set(outtree, event, jet1, jet2)
+            outtree.fill(reset=True)
+
+
+        outfile.cd()
+        outtree.FlushBaskets()       
+        outtree.Write()
+
+#, ROOT.TObject.kOverwrite)
+#outtree.Fill(reset=-1)       
+
+
+if __name__ == '__main__':
+    jobs = [Job(f) for f in args.files]
+    run_pool(jobs, n_jobs=-1)

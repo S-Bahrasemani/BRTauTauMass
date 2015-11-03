@@ -1,4 +1,4 @@
-import yellowhiggs
+#import yellowhiggs
 
 from .sample import Sample
 from .. import NTUPLE_PATH, DEFAULT_STUDENT
@@ -19,7 +19,8 @@ class Higgs(Signal):
                  ntuple_path=NTUPLE_PATH,
                  student=DEFAULT_STUDENT,
                  file_name = None,
-                 suffix='_test',
+                 tree_name = "NOMINAL",
+                 suffix='_train',
                  label=None,
                  **kwargs):
         """
@@ -29,6 +30,8 @@ class Higgs(Signal):
         * mass: Mass of the Higgs boson
         * mode: production mode (VBF/gg)
         """
+
+        self.tree_name = tree_name 
         ## Adding reco level block --SINA
 
         if levels is None:

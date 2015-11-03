@@ -3,7 +3,7 @@ from math import pi
 from rootpy.tree import Cut
 
 from .base import Category
-TRUE_RESONANCE_PT = Cut('true_resonance_pt>100000')
+TRUE_RESONANCE_PT = Cut('parent_pt>50')
 TRUE_LEAD_JET_50 = Cut('true_jet1_no_overlap_pt>50000')
 TRUE_SUBLEAD_JET_30 = Cut('true_jet2_no_overlap_pt>30000')
 TRUE_2J = Cut('num_true_jets_no_overlap>1')
@@ -13,15 +13,15 @@ TRUE_JETS_MASS = Cut('true_mass_jet1_jet2_no_overlap>250000')
 
 HADHAD = Cut('hadhad == 1')
 LEPHAD = Cut('lephad ==1')
-TAU1_ETA = Cut('abs(tau1_eta) < 2.5')
-TAU2_ETA = Cut('abs(tau2_eta) < 2.5')
-TAU1_PT = Cut('tau1_pt > 35000.')
-TAU2_PT = Cut('tau2_pt > 25000.')
+TAU1_ETA = Cut('abs(ditau_tau0_eta) < 2.5')
+TAU2_ETA = Cut('abs(ditau_tau1_eta) < 2.5')
+TAU1_PT = Cut('ditau_tau0_pt > 25.')
+TAU2_PT = Cut('ditau_tau1_pt > 15.')
 
-MET = Cut('MET_et > 20000.') ## evtsel_MET 
-DR_TAUS = Cut('0.8 < dR_tau1_tau2 < 2.4')
-DETA_TAUS = Cut('dEta_tau1_tau2 < 1.5')
-DPHI_MIN_TAUS_MET = Cut ('dPhi_min_tau_MET < {}'.format( pi / 4))
+MET = Cut('met_et > 20.') ## evtsel_MET 
+DR_TAUS = Cut('0.8 < ditau_dr< 2.4')
+DETA_TAUS = Cut('ditau_deta < 1.5')
+DPHI_MIN_TAUS_MET = Cut ('ditau_met_min_dphi< {}'.format( pi / 4))
 
 ## LEPHAD specific cuts
 MT = Cut('transverse_mass_tau1_tau2 < 70000')
@@ -35,8 +35,8 @@ PRESELECTION = (
     & TAU1_PT & TAU2_PT
     & MET
     & DPHI_MIN_TAUS_MET
+    &TRUE_RESONANCE_PT
     )
-
 
 PRESELECTION_LH = (
     LEPHAD 

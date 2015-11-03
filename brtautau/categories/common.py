@@ -1,3 +1,4 @@
+
 from rootpy.tree import Cut
 from math import pi
 
@@ -6,20 +7,22 @@ from .. import MMC_MASS
 from .. import Coll_MASS
 # All basic cut definitions are here
 
-TAU1_MEDIUM = Cut('tau1_JetBDTSigMedium==1')
-TAU2_MEDIUM = Cut('tau2_JetBDTSigMedium==1')
-TAU1_TIGHT = Cut('tau1_JetBDTSigTight==1')
-TAU2_TIGHT = Cut('tau2_JetBDTSigTight==1')
+TAU1_MEDIUM = Cut('ditau_tau0_jet_bdt_tight==1')
+TAU2_MEDIUM = Cut('ditau_tau1_jet_bdt_medium==1')
+TAU1_TIGHT = Cut('ditau_tau0_jet_bdt_medium==1')
+TAU2_TIGHT = Cut('ditau_tau1_jet_bdt_tight==1')
 
 ID_MEDIUM = TAU1_MEDIUM & TAU2_MEDIUM
 ID_TIGHT = TAU1_TIGHT & TAU2_TIGHT
 ID_MEDIUM_TIGHT = (TAU1_MEDIUM & TAU2_TIGHT) | (TAU1_TIGHT & TAU2_MEDIUM)
 
-
 ## LEPHAD basic cut definitions, tau1 is hadronic and tau2 is lepton-- LH Brnches names are different Be carefull 
 TAU_MEDIUM = Cut('evtsel_tau_is_Medium')
-TAU_Positive = Cut('evtsel_tau_charge ==1')
-TAU_Negative = Cut('evtsel_tau_charge ==-1')
+TAU_Positive = Cut('tau1_q ==1')
+TAU_Negative = Cut('tau1_q ==-1')
+TAU_Positive = Cut('tau2_q ==1')
+TAU_Negative = Cut('tau2_q ==-1')
+
 LEP_Positive = Cut('evtsel_lep_charge ==1')
 LEP_Negative = Cut('evtsel_lep_charge ==-1')
 
@@ -37,35 +40,39 @@ OS_TAU_LEP = (TAU_Positive & LEP_Negative) | (TAU_Negative & LEP_Positive)
 ID_MEDIUM_NOT_TIGHT = (TAU1_MEDIUM & -TAU1_TIGHT) & (TAU2_MEDIUM & -TAU2_TIGHT)
 
 TAU_SAME_VERTEX = Cut('tau_same_vertex')
-LEAD_TAU_35 = Cut('tau1_pt > 35000')
-SUBLEAD_TAU_25 = Cut('tau2_pt > 25000')
+LEAD_TAU_35 = Cut('tau_0_pt > 35')
+SUBLEAD_TAU_25 = Cut('tau_1_pt > 25')
 
-LEAD_JET_50 = Cut('jet1_pt > 50000')
-SUBLEAD_JET_30 = Cut('jet2_pt > 30000')
-AT_LEAST_1JET = Cut('jet1_pt > 30000')
+LEAD_JET_50 = Cut('jet_0_pt > 50')
+SUBLEAD_JET_30 = Cut('jet_1_pt > 30')
+AT_LEAST_1JET = Cut('jet_0_pt > 30')
 
 CUTS_2J = LEAD_JET_50 & SUBLEAD_JET_30
 CUTS_1J = LEAD_JET_50 & (- SUBLEAD_JET_30)
 CUTS_0J = (- LEAD_JET_50)
 
-MET = Cut('MET_et > 20000')
-DR_TAUS = Cut('0.8 < dR_tau1_tau2 < 2.4')
-DETA_TAUS = Cut('dEta_tau1_tau2 < 1.5')
-DETA_TAUS_CR = Cut('dEta_tau1_tau2 > 1.5')
-RESONANCE_PT = Cut('resonance_pt > 100000')
+MET = Cut('met_et > 20')
+DR_TAUS = Cut('0.8 < ditau_dr < 2.4')
+DETA_TAUS = Cut('ditau_deta< 1.5')
+DETA_TAUS_CR = Cut('ditau_deta> 1.5')
+
+H_Pt = 100
+RESONANCE_PT = Cut('parent_pt > {}'.format(H_Pt))
+
 
 
 ## LEPHAD specific cuts:
+TAU_PT = Cut('tau1_pt > 20.')
+LEP_PT = Cut('tau2_pt > 12.')
+MT = Cut('transverse_mass_tau1_tau2 < 70')
 
-TAU_PT = Cut('tau1_pt > 20000.')
-LEP_PT = Cut('tau2_pt > 12000.')
-MT = Cut('transverse_mass_tau1_tau2 < 70000')
-
-DPHI_MIN_TAUS_MET = Cut ('dPhi_min_tau_MET <{}'.format( pi / 4))
+DPHI_MIN_TAUS_MET = Cut ('ditau_met_min_dphi <{}'.format( pi / 4))
 # use .format() to set centality value
 MET_CENTRALITY = 'MET_bisecting || (dPhi_min_tau_MET < {0})'
 
 # common preselection cuts
+
+
 PRESELECTION = (
     LEAD_TAU_35 & SUBLEAD_TAU_25
     & ID_MEDIUM_TIGHT
@@ -75,8 +82,9 @@ PRESELECTION = (
     & DR_TAUS
     & DETA_TAUS
     & DPHI_MIN_TAUS_MET
-    & TAU_SAME_VERTEX
+    #& TAU_SAME_VERTEX
     )
+
 
 ## LEPHAD Cuts
 PRESELECTION_LH =(
@@ -93,7 +101,7 @@ PRESELECTION_LH =(
 CUTS_VBF_LH = (
     CUTS_2J
     & Cut('dEta_jets > 3.')
-    & Cut('mass_vis_tau1_tau2 > 40000')
+    & Cut('mass_vis_tau1_tau2 > 40')
     )
 
 
@@ -139,7 +147,7 @@ class Category_Preselection(Category):
     label = '#tau_{had}#tau_{had} Preselection'
     common_cuts = (
         PRESELECTION
-        & Cut(MET_CENTRALITY.format(pi / 4))
+        #& Cut(MET_CENTRALITY.format(pi / 4))
         )
 
 

@@ -18,7 +18,7 @@ class Sample(object):
                  student=DEFAULT_STUDENT,
                  suffix='',
                  level = None,
-                 tree_name='Tree',
+                 tree_name="NOMINAL",
                  name='Sample',
                  label='Sample',
                  weight_field=None,

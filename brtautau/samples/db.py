@@ -19,7 +19,7 @@ TEMPFILE = TemporaryFile()
 PILEUP_FILES = {}
 
 
-def get_file(ntuple_path=NTUPLE_PATH, file_name = None,  student=DEFAULT_STUDENT, hdf=False, suffix='', force_reopen=False, **kwargs):
+def get_file(ntuple_path=NTUPLE_PATH, file_name = None,  student=DEFAULT_STUDENT, hdf=False, suffix='_train' , force_reopen=False, **kwargs):
    
     if file_name is None : 
         ext = '.h5' if hdf else '.root'
@@ -36,13 +36,12 @@ def get_file(ntuple_path=NTUPLE_PATH, file_name = None,  student=DEFAULT_STUDENT
         else:
             student_file = root_open(file_path, 'READ')
             FILES[filename] = student_file
-
+    
     else:
         file_path = os.path.join(ntuple_path, file_name)
         log.info("opening {0} ...".format(file_path))
         student_file = root_open(file_path, 'READ')
         FILES[filename] = student_file
-    
     return student_file
 
 @atexit.register
